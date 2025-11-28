@@ -2,14 +2,6 @@ import { CACHE_DURATION } from '../utils/constants';
 
 const cache = new Map();
 
-const CACHE_MESSAGES = {
-  HIT: 'Datos obtenidos de cache',
-  MISS: 'Cache miss - obteniendo datos frescos',
-  SET: 'Datos almacenados en cache',
-  CLEAR: 'Cache limpiado',
-  EXPIRED: 'Cache expirado'
-};
-
 const isExpired = (timestamp) => {
   return Date.now() - timestamp > CACHE_DURATION;
 };
@@ -47,7 +39,9 @@ export const cacheService = {
 
   has(key) {
     const cached = cache.get(key);
-    if (!cached) return false;
+    if (!cached) {
+      return false;
+    }
     
     if (isExpired(cached.timestamp)) {
       cache.delete(key);
@@ -79,5 +73,3 @@ export const generateCacheKey = (endpoint, params = {}) => {
 
   return `${endpoint}?${sortedParams}`;
 };
-
-export { CACHE_MESSAGES };

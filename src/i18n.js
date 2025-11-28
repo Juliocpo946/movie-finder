@@ -1,4 +1,3 @@
-// src/i18n.js
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -7,7 +6,7 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    fallbackLng: 'es',
+    fallbackLng: 'en',
     interpolation: {
       escapeValue: false
     },
@@ -15,44 +14,44 @@ i18n
       en: {
         translation: {
           common: {
-            loading: 'INITIALIZING_SYSTEM...',
-            search: 'SEARCH_DATABASE',
-            favorites: 'SAVED_FILES',
+            loading: 'LOADING...',
+            search: 'SEARCH',
+            favorites: 'SAVED',
             settings: 'CONFIG',
-            no_results: 'DATA_NOT_FOUND',
-            error: 'Ooooops system failure',
-            go_back: 'RETURN_TO_ROOT'
+            no_results: 'NO_RESULTS',
+            error: 'ERROR',
+            go_back: 'GO_BACK'
           },
           home: {
-            welcome: 'ARCHIVE_PROTOCOL_V1',
-            subtitle: 'ACCESS_GLOBAL_CINEMA_DATABASE'
+            welcome: 'Search movies and series...',
+            subtitle: 'Access the global cinema database'
           },
           filters: {
-            all: 'ALL_VX',
-            movies: 'MOVIES.EQ',
-            series: 'SERIES.EQ'
+            all: 'ALL',
+            movies: 'MOVIES',
+            series: 'SERIES'
           }
         }
       },
       es: {
         translation: {
           common: {
-            loading: 'INICIALIZANDO_SISTEMA...',
-            search: 'BUSCAR_EN_BASE_DE_DATOS',
-            favorites: 'ARCHIVOS_GUARDADOS',
-            settings: 'CONFIGURACION',
-            no_results: 'DATOS_NO_ENCONTRADOS',
-            error: 'Falla critica del sistema',
-            go_back: 'RETORNAR_A_RAIZ'
+            loading: 'CARGANDO...',
+            search: 'BUSCAR',
+            favorites: 'GUARDADOS',
+            settings: 'CONFIG',
+            no_results: 'SIN_RESULTADOS',
+            error: 'ERROR',
+            go_back: 'VOLVER'
           },
           home: {
-            welcome: 'PROTOCOLO_ARCHIVO_V1',
-            subtitle: 'ACCESO_BASE_DATOS_CINE_GLOBAL'
+            welcome: 'Buscar peliculas y series...',
+            subtitle: 'Acceso a la base de datos global de cine'
           },
           filters: {
-            all: 'TODO_VX',
-            movies: 'PELICULAS.EQ',
-            series: 'SERIES.EQ'
+            all: 'TODO',
+            movies: 'PELICULAS',
+            series: 'SERIES'
           }
         }
       }

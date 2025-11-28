@@ -4,16 +4,6 @@ import { STORAGE_KEYS } from '../utils';
 
 const FavoritesContext = createContext(null);
 
-const FAVORITES_MESSAGES = {
-  ADDED: 'Agregado a favoritos',
-  REMOVED: 'Eliminado de favoritos',
-  ALREADY_EXISTS: 'Ya existe en favoritos',
-  NOT_FOUND: 'No encontrado en favoritos',
-  CLEARED: 'Favoritos limpiados',
-  ERROR_ADDING: 'Error al agregar a favoritos',
-  ERROR_REMOVING: 'Error al eliminar de favoritos'
-};
-
 const FavoritesProvider = ({ children }) => {
   const [favorites, setFavorites] = useState(() => {
     return storageService.get(STORAGE_KEYS.FAVORITES, []);
@@ -29,11 +19,11 @@ const FavoritesProvider = ({ children }) => {
 
   const addFavorite = useCallback((item) => {
     if (!item || !item.imdbID) {
-      return { success: false, message: FAVORITES_MESSAGES.ERROR_ADDING };
+      return { success: false };
     }
 
     if (isFavorite(item.imdbID)) {
-      return { success: false, message: FAVORITES_MESSAGES.ALREADY_EXISTS };
+      return { success: false };
     }
 
     const favoriteItem = {
@@ -46,21 +36,17 @@ const FavoritesProvider = ({ children }) => {
     };
 
     setFavorites((prev) => [...prev, favoriteItem]);
-    return { success: true, message: FAVORITES_MESSAGES.ADDED };
+    return { success: true };
   }, [isFavorite]);
 
   const removeFavorite = useCallback((imdbID) => {
     if (!imdbID) {
-      return { success: false, message: FAVORITES_MESSAGES.ERROR_REMOVING };
-    }
-
-    if (!isFavorite(imdbID)) {
-      return { success: false, message: FAVORITES_MESSAGES.NOT_FOUND };
+      return { success: false };
     }
 
     setFavorites((prev) => prev.filter((item) => item.imdbID !== imdbID));
-    return { success: true, message: FAVORITES_MESSAGES.REMOVED };
-  }, [isFavorite]);
+    return { success: true };
+  }, []);
 
   const toggleFavorite = useCallback((item) => {
     if (isFavorite(item.imdbID)) {
@@ -71,11 +57,13 @@ const FavoritesProvider = ({ children }) => {
 
   const clearFavorites = useCallback(() => {
     setFavorites([]);
-    return { success: true, message: FAVORITES_MESSAGES.CLEARED };
+    return { success: true };
   }, []);
 
   const getFavoritesByType = useCallback((type) => {
-    if (!type) return favorites;
+    if (!type) {
+      return favorites;
+    }
     return favorites.filter((item) => item.Type === type);
   }, [favorites]);
 
@@ -115,10 +103,10 @@ const useFavorites = () => {
   const context = useContext(FavoritesContext);
   
   if (!context) {
-    throw new Error('useFavorites debe usarse dentro de FavoritesProvider');
+    throw new Error('useFavorites must be used within FavoritesProvider');
   }
   
   return context;
 };
 
-export { FavoritesProvider, useFavorites, FavoritesContext, FAVORITES_MESSAGES };
+export { FavoritesProvider, useFavorites, FavoritesContext };

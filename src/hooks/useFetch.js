@@ -1,21 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
 import { cacheService, generateCacheKey } from '../services';
 
-const FETCH_STATUS = {
+export const FETCH_STATUS = {
   IDLE: 'idle',
   LOADING: 'loading',
   SUCCESS: 'success',
   ERROR: 'error'
 };
 
-const FETCH_MESSAGES = {
-  IDLE: 'Esperando solicitud',
-  LOADING: 'Cargando...',
-  SUCCESS: 'Datos obtenidos correctamente',
-  ERROR: 'Error al obtener datos'
+export const FETCH_MESSAGES = {
+  IDLE: 'Waiting',
+  LOADING: 'Loading...',
+  SUCCESS: 'Success',
+  ERROR: 'Error fetching data'
 };
 
-const useFetch = (fetchFunction, params = {}, options = {}) => {
+export const useFetch = (fetchFunction, params = {}, options = {}) => {
   const { 
     immediate = true, 
     useCache = true,
@@ -96,5 +96,3 @@ const useFetch = (fetchFunction, params = {}, options = {}) => {
     reset
   };
 };
-
-export { useFetch, FETCH_STATUS, FETCH_MESSAGES };

@@ -1,15 +1,3 @@
-const STORAGE_MESSAGES = {
-  SAVE_SUCCESS: 'Datos guardados correctamente',
-  SAVE_ERROR: 'Error al guardar los datos',
-  GET_ERROR: 'Error al obtener los datos',
-  REMOVE_SUCCESS: 'Datos eliminados correctamente',
-  REMOVE_ERROR: 'Error al eliminar los datos',
-  CLEAR_SUCCESS: 'Almacenamiento limpiado correctamente',
-  CLEAR_ERROR: 'Error al limpiar el almacenamiento',
-  STORAGE_UNAVAILABLE: 'Almacenamiento local no disponible',
-  QUOTA_EXCEEDED: 'Espacio de almacenamiento agotado'
-};
-
 const isStorageAvailable = () => {
   try {
     const test = '__storage_test__';
@@ -24,30 +12,18 @@ const isStorageAvailable = () => {
 export const storageService = {
   set(key, value) {
     if (!isStorageAvailable()) {
-      return {
-        success: false,
-        message: STORAGE_MESSAGES.STORAGE_UNAVAILABLE
-      };
+      return { success: false, message: 'Storage unavailable' };
     }
 
     try {
       const serializedValue = JSON.stringify(value);
       localStorage.setItem(key, serializedValue);
-      return {
-        success: true,
-        message: STORAGE_MESSAGES.SAVE_SUCCESS
-      };
+      return { success: true };
     } catch (error) {
       if (error.name === 'QuotaExceededError') {
-        return {
-          success: false,
-          message: STORAGE_MESSAGES.QUOTA_EXCEEDED
-        };
+        return { success: false, message: 'Storage quota exceeded' };
       }
-      return {
-        success: false,
-        message: STORAGE_MESSAGES.SAVE_ERROR
-      };
+      return { success: false, message: 'Storage error' };
     }
   },
 
@@ -69,45 +45,27 @@ export const storageService = {
 
   remove(key) {
     if (!isStorageAvailable()) {
-      return {
-        success: false,
-        message: STORAGE_MESSAGES.STORAGE_UNAVAILABLE
-      };
+      return { success: false };
     }
 
     try {
       localStorage.removeItem(key);
-      return {
-        success: true,
-        message: STORAGE_MESSAGES.REMOVE_SUCCESS
-      };
+      return { success: true };
     } catch {
-      return {
-        success: false,
-        message: STORAGE_MESSAGES.REMOVE_ERROR
-      };
+      return { success: false };
     }
   },
 
   clear() {
     if (!isStorageAvailable()) {
-      return {
-        success: false,
-        message: STORAGE_MESSAGES.STORAGE_UNAVAILABLE
-      };
+      return { success: false };
     }
 
     try {
       localStorage.clear();
-      return {
-        success: true,
-        message: STORAGE_MESSAGES.CLEAR_SUCCESS
-      };
+      return { success: true };
     } catch {
-      return {
-        success: false,
-        message: STORAGE_MESSAGES.CLEAR_ERROR
-      };
+      return { success: false };
     }
   },
 
@@ -116,28 +74,5 @@ export const storageService = {
       return false;
     }
     return localStorage.getItem(key) !== null;
-  },
-
-  getKeys() {
-    if (!isStorageAvailable()) {
-      return [];
-    }
-    return Object.keys(localStorage);
-  },
-
-  getSize() {
-    if (!isStorageAvailable()) {
-      return 0;
-    }
-
-    let totalSize = 0;
-    for (const key in localStorage) {
-      if (Object.prototype.hasOwnProperty.call(localStorage, key)) {
-        totalSize += localStorage[key].length + key.length;
-      }
-    }
-    return totalSize;
   }
 };
-
-export { STORAGE_MESSAGES };

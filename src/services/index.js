@@ -1,2 +1,2 @@
-export { storageService, STORAGE_MESSAGES } from './storage';
-export { cacheService, generateCacheKey, CACHE_MESSAGES } from './cache';
+export { storageService } from './storage';
+export { cacheService, generateCacheKey } from './cache';

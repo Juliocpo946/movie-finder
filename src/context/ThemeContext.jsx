@@ -7,7 +7,9 @@ const ThemeContext = createContext(null);
 const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
     const stored = storageService.get(STORAGE_KEYS.THEME);
-    if (stored) return stored;
+    if (stored) {
+      return stored;
+    }
     
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     return prefersDark ? THEMES.DARK : THEMES.LIGHT;
@@ -59,7 +61,7 @@ const useTheme = () => {
   const context = useContext(ThemeContext);
   
   if (!context) {
-    throw new Error('useTheme debe usarse dentro de ThemeProvider');
+    throw new Error('useTheme must be used within ThemeProvider');
   }
   
   return context;
