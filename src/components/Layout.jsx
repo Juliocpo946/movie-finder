@@ -3,9 +3,9 @@ import Navbar from './Navbar';
 
 const Layout = () => {
   return (
-    <div className="min-h-screen transition-colors duration-300 bg-gray-100 text-gray-900 dark:bg-[#0a0a0a] dark:text-[#ededed]">
+    <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main>
+      <main className="flex-grow">
         <Outlet />
       </main>
       <ScrollRestoration />

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useMediaDetails, DETAILS_STATUS } from '../hooks/useMediaDetails';
@@ -7,13 +7,14 @@ import { useFavorites } from '../context/FavoritesContext';
 import Loader from '../components/Loader';
 import Button from '../components/Button';
 import Card from '../components/Card';
-import { getPosterUrl, getRatingColor } from '../utils';
+import { getPosterUrl, getRatingColor, translateGenre, translateType } from '../utils';
 
 const DetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { details, status, fetchById } = useMediaDetails();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const [copied, setCopied] = useState(false);
   
   const { 
     results: recommendations, 
@@ -35,6 +36,25 @@ const DetailPage = () => {
     }
   }, [details, searchRecommendations]);
 
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: details.Title,
+          text: `Check out ${details.Title} on Movie Finder`,
+          url: url,
+        });
+      } catch (err) {
+        console.log('Error sharing', err);
+      }
+    } else {
+      navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   if (status === DETAILS_STATUS.LOADING) {
     return <Loader text="LOADING DATA" />;
   }
@@ -55,6 +75,9 @@ const DetailPage = () => {
   const ratingColor = getRatingColor(details.imdbRating);
   const trailerUrl = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(details.Title + ' official trailer')}`;
   
+  const translatedGenre = translateGenre(details.Genre, 'en');
+  const translatedType = translateType(details.Type, 'en');
+
   const filteredRecommendations = recommendations
     .filter((item) => item.imdbID !== details.imdbID)
     .slice(0, 5);
@@ -81,7 +104,7 @@ const DetailPage = () => {
               }}
             />
             <div className="absolute top-4 left-4 bg-[#ff2e00] text-white font-bold px-3 py-1 text-sm font-mono uppercase">
-              {details.Type}
+              {translatedType}
             </div>
           </div>
           
@@ -95,6 +118,13 @@ const DetailPage = () => {
                 }`}
             >
               {isFav ? '✓ REMOVE FROM LIST' : 'ADD TO LIST'}
+            </button>
+
+            <button 
+              onClick={handleShare}
+              className="w-full py-4 font-bold text-sm tracking-widest border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors uppercase font-mono"
+            >
+              {copied ? '✓ LINK COPIED' : 'SHARE TITLE'}
             </button>
             
             <Button 
@@ -126,6 +156,12 @@ const DetailPage = () => {
             >
               <span className="bg-gray-200 text-black dark:text-white dark:bg-gray-800 px-2 py-1">{details.Year}</span>
               <span className="text-[#ff2e00]">//</span>
+              {details.Rated && details.Rated !== 'N/A' && (
+                <>
+                  <span className="border border-gray-400 dark:border-gray-600 px-2 rounded-sm">{details.Rated}</span>
+                  <span className="text-[#ff2e00]">//</span>
+                </>
+              )}
               {details.Runtime && details.Runtime !== 'N/A' && (
                 <>
                   <span>{details.Runtime}</span>
@@ -136,6 +172,14 @@ const DetailPage = () => {
                 <span style={{ color: ratingColor }} className="font-bold text-lg">
                   {details.imdbRating} IMDb
                 </span>
+              )}
+              {details.Metascore && details.Metascore !== 'N/A' && (
+                <>
+                  <span className="text-[#ff2e00]">//</span>
+                  <span className={`font-bold ${parseInt(details.Metascore) > 60 ? 'text-green-500' : 'text-yellow-500'}`}>
+                    {details.Metascore} Metascore
+                  </span>
+                </>
               )}
             </motion.div>
           </header>
@@ -151,7 +195,7 @@ const DetailPage = () => {
               <DataRow label="DIRECTOR" value={details.Director} />
             )}
             {details.Genre && details.Genre !== 'N/A' && (
-              <DataRow label="GENRE" value={details.Genre} />
+              <DataRow label="GENRE" value={translatedGenre} />
             )}
             {details.Actors && details.Actors !== 'N/A' && (
               <DataRow label="CAST" value={details.Actors} />

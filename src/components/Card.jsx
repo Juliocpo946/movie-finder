@@ -1,20 +1,22 @@
 import { motion } from 'framer-motion';
 import { getPosterUrl } from '../utils';
 
-const Card = ({ item, onClick }) => {
+const Card = ({ item, onClick, viewMode = 'grid' }) => {
   const posterUrl = getPosterUrl(item.Poster);
+  const isList = viewMode === 'list';
   
   return (
     <motion.div
       layoutId={item.imdbID}
       onClick={() => onClick(item.imdbID)}
-      className="group relative cursor-pointer h-[400px] overflow-hidden bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-white/5"
+      className={`group relative cursor-pointer overflow-hidden bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-white/5 
+        ${isList ? 'flex h-48 w-full' : 'h-[400px] w-full'}`}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: false, amount: 0.2 }}
       transition={{ duration: 0.8, ease: "easeInOut" }}
     >
-      <div className="w-full h-full overflow-hidden">
+      <div className={`${isList ? 'w-32 shrink-0' : 'w-full h-full'} overflow-hidden relative`}>
         <motion.img 
           src={posterUrl} 
           alt={item.Title}
@@ -26,29 +28,37 @@ const Card = ({ item, onClick }) => {
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         />
+        {!isList && (
+          <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent dark:from-black dark:via-black/40 opacity-60 group-hover:opacity-90 transition-opacity duration-700" />
+        )}
       </div>
 
-      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent dark:from-black dark:via-black/40 opacity-60 group-hover:opacity-90 transition-opacity duration-700" />
+      {!isList && (
+        <div className="absolute top-0 right-0 p-4 transform translate-y-[-10px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-700 ease-out">
+          <span className="bg-[#ff2e00] text-white dark:text-black text-xs font-bold px-2 py-1 font-mono uppercase tracking-wider shadow-md">
+            {item.Type}
+          </span>
+        </div>
+      )}
 
-      <div className="absolute top-0 right-0 p-4 transform translate-y-[-10px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-700 ease-out">
-        <span className="bg-[#ff2e00] text-white dark:text-black text-xs font-bold px-2 py-1 font-mono uppercase tracking-wider shadow-md">
-          {item.Type}
-        </span>
-      </div>
-
-      <div className="absolute bottom-0 left-0 w-full p-6">
+      <div className={`${isList ? 'p-6 flex flex-col justify-between w-full' : 'absolute bottom-0 left-0 w-full p-6'}`}>
         <div className="overflow-hidden mb-2">
           <motion.h3 
-            className="text-2xl font-oswald font-bold text-gray-900 dark:text-white uppercase leading-none truncate"
+            className={`font-oswald font-bold text-gray-900 dark:text-white uppercase leading-none ${isList ? 'text-3xl line-clamp-2' : 'text-2xl truncate'}`}
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}
           >
             {item.Title}
           </motion.h3>
+          {isList && (
+             <span className="bg-[#ff2e00] text-white dark:text-black text-xs font-bold px-2 py-1 font-mono uppercase tracking-wider inline-block mt-2">
+               {item.Type}
+             </span>
+          )}
         </div>
         
-        <div className="flex items-center justify-between border-t border-gray-400 dark:border-white/10 pt-3 mt-2 opacity-70 group-hover:opacity-100 transition-opacity duration-500">
+        <div className={`flex items-center justify-between border-t border-gray-400 dark:border-white/10 pt-3 mt-2 ${!isList ? 'opacity-70 group-hover:opacity-100 transition-opacity duration-500' : ''}`}>
           <span className="text-[#ff2e00] font-mono text-sm font-bold tracking-widest">
             {item.Year}
           </span>

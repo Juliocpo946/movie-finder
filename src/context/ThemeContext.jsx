@@ -10,21 +10,15 @@ const ThemeProvider = ({ children }) => {
     if (stored) {
       return stored;
     }
-    
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     return prefersDark ? THEMES.DARK : THEMES.LIGHT;
   });
 
   useEffect(() => {
-    const root = document.documentElement;
+    const root = window.document.documentElement;
     
-    if (theme === THEMES.DARK) {
-      root.classList.add('dark');
-      root.classList.remove('light');
-    } else {
-      root.classList.add('light');
-      root.classList.remove('dark');
-    }
+    root.classList.remove(THEMES.LIGHT, THEMES.DARK);
+    root.classList.add(theme);
     
     storageService.set(STORAGE_KEYS.THEME, theme);
   }, [theme]);
@@ -34,11 +28,9 @@ const ThemeProvider = ({ children }) => {
   };
 
   const setDarkTheme = () => setTheme(THEMES.DARK);
-  
   const setLightTheme = () => setTheme(THEMES.LIGHT);
 
   const isDark = theme === THEMES.DARK;
-  
   const isLight = theme === THEMES.LIGHT;
 
   const value = {
@@ -59,11 +51,9 @@ const ThemeProvider = ({ children }) => {
 
 const useTheme = () => {
   const context = useContext(ThemeContext);
-  
   if (!context) {
     throw new Error('useTheme must be used within ThemeProvider');
   }
-  
   return context;
 };
 
