@@ -9,7 +9,11 @@ export const formatDate = (dateString) => {
   if (!dateString || dateString === 'N/A') return 'Fecha no disponible';
   
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  return new Date(dateString).toLocaleDateString('es-MX', options);
+  try {
+    return new Date(dateString).toLocaleDateString('es-MX', options);
+  } catch (e) {
+    return dateString;
+  }
 };
 
 export const formatYear = (year) => {
@@ -18,7 +22,7 @@ export const formatYear = (year) => {
 };
 
 export const formatRuntime = (runtime) => {
-  if (!runtime || runtime === 'N/A') return 'Duracion no disponible';
+  if (!runtime || runtime === 'N/A') return 'Duración no disponible';
   
   const minutes = parseInt(runtime);
   if (isNaN(minutes)) return runtime;
@@ -70,7 +74,7 @@ export const truncateText = (text, maxLength = 150) => {
 };
 
 export const getTitle = (item) => {
-  return item.Title || 'Sin titulo';
+  return item.Title || 'Sin título';
 };
 
 export const getYear = (item) => {
@@ -79,7 +83,7 @@ export const getYear = (item) => {
 
 export const getType = (item) => {
   const types = {
-    movie: 'Pelicula',
+    movie: 'Película',
     series: 'Serie',
     episode: 'Episodio'
   };
@@ -88,25 +92,6 @@ export const getType = (item) => {
 
 export const generateUniqueId = () => {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-};
-
-export const debounce = (func, wait) => {
-  let timeout;
-  return (...args) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-};
-
-export const throttle = (func, limit) => {
-  let inThrottle;
-  return (...args) => {
-    if (!inThrottle) {
-      func(...args);
-      inThrottle = true;
-      setTimeout(() => (inThrottle = false), limit);
-    }
-  };
 };
 
 export const classNames = (...classes) => {
@@ -122,12 +107,6 @@ export const shuffleArray = (array) => {
   return shuffled;
 };
 
-export const removeDuplicates = (array, key = 'imdbID') => {
-  return array.filter(
-    (item, index, self) => index === self.findIndex((t) => t[key] === item[key])
-  );
-};
-
 export const parseOmdbSearch = (data) => {
   if (!data || !data.Search) return [];
   return data.Search;
@@ -141,23 +120,4 @@ export const getTotalResults = (data) => {
 export const getTotalPages = (data) => {
   const total = getTotalResults(data);
   return Math.ceil(total / 10);
-};
-
-export const sortResults = (results, sortBy) => {
-  if (!results || !results.length) return [];
-  
-  const sorted = [...results];
-  
-  switch (sortBy) {
-    case 'year_desc':
-      return sorted.sort((a, b) => parseInt(b.Year) - parseInt(a.Year));
-    case 'year_asc':
-      return sorted.sort((a, b) => parseInt(a.Year) - parseInt(b.Year));
-    case 'title_asc':
-      return sorted.sort((a, b) => a.Title.localeCompare(b.Title));
-    case 'title_desc':
-      return sorted.sort((a, b) => b.Title.localeCompare(a.Title));
-    default:
-      return sorted;
-  }
 };

@@ -1,35 +1,33 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss"; /* <--- ESTO REEMPLAZA A LAS 3 LÍNEAS ANTIGUAS */
 
-:root {
-  --color-primary: #0d1117;
-  --color-secondary: #161b22;
-  --color-accent: #1f6feb;
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Oswald:wght@500;700&display=swap');
+
+/* Configuración del tema (En v4 esto también puede ir aquí, pero mantenemos tu CSS custom) */
+@theme {
+  --font-oswald: 'Oswald', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+  
+  --color-black: #0a0a0a;
+  --color-white: #ededed;
+  --color-accent: #ff2e00;
+  
+  --color-gray-800: #1a1a1a;
+  --color-gray-900: #0f0f0f;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+:root {
+  --bg-color: #0a0a0a;
+  --text-primary: #ededed;
 }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background-color: var(--color-primary);
-  color: #e6edf3;
-  min-height: 100vh;
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #161b22;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #30363d;
-  border-radius: 4px;
+  background-color: var(--bg-color);
+  background-image: 
+    linear-gradient(#1a1a1a 1px, transparent 1px),
+    linear-gradient(90deg, #1a1a1a 1px, transparent 1px);
+  background-size: 40px 40px;
+  color: var(--text-primary);
+  font-family: 'Space Mono', monospace;
+  overflow-x: hidden;
+  margin: 0;
 }

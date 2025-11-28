@@ -6,10 +6,10 @@ export const CONTENT_TYPES = {
 };
 
 export const SORT_OPTIONS = [
-  { value: 'year_desc', label: 'Mas recientes' },
-  { value: 'year_asc', label: 'Mas antiguas' },
-  { value: 'title_asc', label: 'Titulo A-Z' },
-  { value: 'title_desc', label: 'Titulo Z-A' }
+  { value: 'year_desc', label: 'Más recientes' },
+  { value: 'year_asc', label: 'Más antiguas' },
+  { value: 'title_asc', label: 'Título A-Z' },
+  { value: 'title_desc', label: 'Título Z-A' }
 ];
 
 export const VIEW_MODES = {
@@ -31,14 +31,14 @@ export const THEMES = {
 
 export const PAGINATION = {
   DEFAULT_PAGE: 1,
-  ITEMS_PER_PAGE: 20
+  ITEMS_PER_PAGE: 10
 };
 
+// ESTA ES LA LÍNEA QUE TE FALTA Y CAUSA EL ERROR
+export const CACHE_DURATION = 5 * 60 * 1000; 
+
 export const DEBOUNCE_DELAY = 500;
-
-export const CACHE_DURATION = 5 * 60 * 1000;
-
-export const PLACEHOLDER_IMAGE = '/placeholder-poster.png';
+export const PLACEHOLDER_IMAGE = 'https://placehold.co/300x450/1a1a1a/ededed?text=NO+IMG';
 
 export const RATING_COLORS = {
   HIGH: '#22c55e',
@@ -53,3 +53,19 @@ export const BREAKPOINTS = {
   XL: 1280,
   XXL: 1536
 };
+
+// TENDENCIAS Y GÉNEROS
+export const INITIAL_QUERIES = [
+  'Marvel', 'Star Wars', 'Harry Potter', 'Lord of the Rings', 
+  'John Wick', 'Batman', 'Spider-Man', 'Inception', 
+  'Matrix', 'Dune', 'Fast and Furious', 'Godzilla'
+];
+
+export const GENRES = [
+  { label: 'ACTION', value: 'Action' },
+  { label: 'COMEDY', value: 'Comedy' },
+  { label: 'DRAMA', value: 'Drama' },
+  { label: 'HORROR', value: 'Horror' },
+  { label: 'SCI-FI', value: 'Sci-Fi' },
+  { label: 'ANIMATION', value: 'Animation' }
+];

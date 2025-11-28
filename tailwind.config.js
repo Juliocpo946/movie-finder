@@ -7,15 +7,19 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        // Aquí definimos las fuentes que usamos en el código
+        oswald: ['Oswald', 'sans-serif'],
+        mono: ['Space Mono', 'monospace'],
+      },
       colors: {
-        primary: '#0d1117',
-        secondary: '#161b22',
-        accent: '#1f6feb',
-        surface: '#21262d',
-        border: '#30363d',
-        text: {
-          primary: '#e6edf3',
-          secondary: '#8b949e'
+        // Aquí definimos los colores del tema
+        black: '#0a0a0a',
+        white: '#ededed',
+        accent: '#ff2e00', // Rojo neón
+        gray: {
+          800: '#1a1a1a',
+          900: '#0f0f0f',
         }
       }
     }
