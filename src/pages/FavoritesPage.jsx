@@ -1,11 +1,9 @@
-import { useTranslation } from 'react-i18next';
 import { useFavorites } from '../context/FavoritesContext';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { useNavigate } from 'react-router-dom';
 
 const FavoritesPage = () => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const { favorites, clearFavorites, getMoviesCount, getSeriesCount } = useFavorites();
 
@@ -13,17 +11,17 @@ const FavoritesPage = () => {
   const seriesCount = getSeriesCount();
 
   return (
-    <div className="space-y-8">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-gray-800 pb-4 gap-4">
-        <div>
-          <h1 className="text-4xl md:text-6xl font-oswald uppercase">
-            {t('common.favorites')} 
-            <span className="text-[#ff2e00] text-2xl align-top ml-2">[{favorites.length}]</span>
+    <div className="max-w-7xl mx-auto px-6 pt-32 pb-20 space-y-12">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b-4 border-gray-200 dark:border-white pb-8 gap-6">
+        <div className="space-y-4">
+          <h1 className="text-5xl md:text-7xl font-oswald uppercase leading-none text-black dark:text-white">
+            FAVORITES 
+            <span className="text-[#ff2e00] text-3xl align-top ml-3">[{favorites.length}]</span>
           </h1>
-          <div className="flex gap-4 mt-2 font-mono text-sm text-gray-500">
-            <span>Movies: {moviesCount}</span>
-            <span>//</span>
-            <span>Series: {seriesCount}</span>
+          <div className="flex gap-6 font-mono text-gray-600 dark:text-gray-400 text-sm md:text-base">
+            <span className="bg-gray-200 dark:bg-gray-900 px-3 py-1 text-black dark:text-white">MOVIES: {moviesCount}</span>
+            <span className="text-[#ff2e00]">//</span>
+            <span className="bg-gray-200 dark:bg-gray-900 px-3 py-1 text-black dark:text-white">SERIES: {seriesCount}</span>
           </div>
         </div>
         
@@ -31,22 +29,22 @@ const FavoritesPage = () => {
           <Button 
             onClick={() => clearFavorites()} 
             variant="danger"
-            className="text-xs"
+            className="text-sm px-6 py-3"
           >
-            CLEAR_ALL
+            CLEAR ALL
           </Button>
         )}
       </header>
 
       {favorites.length === 0 ? (
-        <div className="h-64 flex flex-col items-center justify-center border border-gray-800 bg-gray-900/20 border-dashed gap-4">
-          <p className="font-mono text-gray-500">EMPTY_COLLECTION</p>
-          <Button onClick={() => navigate('/')} variant="secondary">
-            BROWSE_TITLES
+        <div className="min-h-[400px] flex flex-col items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/20 rounded-lg gap-6">
+          <p className="font-mono text-gray-500 text-xl">EMPTY COLLECTION</p>
+          <Button onClick={() => navigate('/')} variant="primary">
+            BROWSE TITLES
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {favorites.map((item) => (
             <Card 
               key={item.imdbID} 

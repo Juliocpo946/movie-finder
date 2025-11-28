@@ -1,5 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearch, SEARCH_STATUS } from '../hooks/useSearch';
 import { useTrending } from '../hooks/useTrending';
@@ -13,7 +12,6 @@ import { TYPE_FILTERS } from '../utils/constants';
 import { omdbApi } from '../api';
 import { getPosterUrl } from '../utils';
 
-// Componente ROBUSTO que no se oculta si falla
 const PopularSection = ({ title, type, navigate }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,40 +53,23 @@ const PopularSection = ({ title, type, navigate }) => {
     return () => { isMounted = false; };
   }, [type]);
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-mono text-gray-400 uppercase tracking-widest">{title}</h2>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-[300px] bg-gray-900 animate-pulse border border-gray-800" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // SI HAY ERROR, LO MOSTRAMOS EN LUGAR DE ESCONDERLO
-  if (items.length === 0 || error) {
-    return (
-      <div className="border border-red-800 bg-red-900/20 p-4 my-4">
-        <h3 className="text-red-500 font-mono text-xs font-bold uppercase">Error loading {title}</h3>
-        <p className="text-gray-400 font-mono text-[10px]">{error || "Unknown error"}</p>
-      </div>
-    );
-  }
+  if (loading || items.length === 0 || error) return null;
 
   return (
-    <div className="space-y-6">
+    <motion.div 
+      className="space-y-8"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: false, amount: 0.1 }}
+      transition={{ duration: 1.2 }}
+    >
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-mono text-gray-400 uppercase tracking-widest">
-          {title} <span className="text-white">[{items.length}]</span>
+        <h2 className="text-xl font-oswald text-gray-900 dark:text-white uppercase tracking-widest border-l-4 border-[#ff2e00] pl-4">
+          {title} <span className="text-gray-500 text-sm ml-2">[{items.length}]</span>
         </h2>
-        <div className="h-px bg-gray-800 flex-grow ml-4" />
+        <div className="h-px bg-gray-300 dark:bg-gray-800 flex-grow ml-6" />
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {items.map((item) => (
           <Card 
             key={item.imdbID} 
@@ -97,23 +78,17 @@ const PopularSection = ({ title, type, navigate }) => {
           />
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 };
 
 const HomePage = () => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const { addFavorite } = useFavorites();
   const [activeType, setActiveType] = useState('');
-  const initialized = useRef(false);
 
   const { trending, featuredMovie, isLoading: trendingLoading, error: trendingError } = useTrending();
   const { query, setQuery, debouncedQuery, results, status, error, pagination, search, loadMore } = useSearch({ debounceDelay: 400 });
-
-  useEffect(() => {
-    if (!initialized.current) initialized.current = true;
-  }, []);
 
   useEffect(() => {
     if (debouncedQuery.length >= 2) {
@@ -121,14 +96,9 @@ const HomePage = () => {
     }
   }, [debouncedQuery, activeType, search]);
 
-  const handleTypeChange = useCallback((type) => {
+  const handleTypeChange = (type) => {
     setActiveType(type);
-    if (debouncedQuery.length >= 2) {
-      search(debouncedQuery, { type });
-    } else {
-      // Logic for fallback search could go here
-    }
-  }, [debouncedQuery, search]);
+  };
 
   const handleLoadMore = useCallback(() => {
     loadMore(debouncedQuery, { type: activeType });
@@ -139,44 +109,37 @@ const HomePage = () => {
   const showLoader = isSearchMode ? status === SEARCH_STATUS.LOADING : trendingLoading;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
-      {/* Diagnóstico de API Key en pantalla */}
-      {!import.meta.env.VITE_OMDB_API_KEY && (
-        <div className="bg-red-600 text-white font-mono text-center text-xs py-2">
-          CRITICAL: VITE_OMDB_API_KEY is missing in .env
-        </div>
-      )}
-
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a]">
       <AnimatePresence>
         {!isSearchMode && featuredMovie && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.5 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5 }}
           >
             <Hero movie={featuredMovie} onAddToWatchlist={addFavorite} />
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="sticky top-16 z-40 bg-[#0a0a0a]/95 backdrop-blur-sm border-b border-white/10 py-6 px-4">
+      <div className="sticky top-20 z-40 bg-white/90 dark:bg-[#0a0a0a]/95 backdrop-blur-md border-b border-gray-200 dark:border-white/10 py-6 px-4 transition-all duration-500">
         <div className="max-w-7xl mx-auto space-y-4">
           <Input
-            placeholder={t('home.welcome')}
+            placeholder="Search movies and series..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="text-2xl md:text-4xl font-oswald uppercase"
+            className="text-2xl md:text-4xl font-oswald uppercase text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600 border-gray-300 dark:border-gray-700"
           />
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {TYPE_FILTERS.map((filter) => (
               <button
                 key={filter.value}
                 onClick={() => handleTypeChange(filter.value)}
-                className={`px-4 py-2 text-xs font-mono border transition-all whitespace-nowrap uppercase tracking-wider
+                className={`px-6 py-2 text-xs font-mono border transition-all duration-500 whitespace-nowrap uppercase tracking-wider
                   ${activeType === filter.value 
-                    ? 'bg-[#ff2e00] border-[#ff2e00] text-black font-bold' 
-                    : 'border-gray-800 text-gray-500 hover:border-white hover:text-white'
+                    ? 'bg-[#ff2e00] border-[#ff2e00] text-white font-bold transform scale-105' 
+                    : 'border-gray-300 dark:border-gray-800 text-gray-600 dark:text-gray-500 hover:border-black dark:hover:border-white hover:text-black dark:hover:text-white'
                   }`}
               >
                 {filter.label}
@@ -186,51 +149,62 @@ const HomePage = () => {
         </div>
       </div>
 
-      <section className="max-w-7xl mx-auto px-4 py-12">
+      <section className="max-w-7xl mx-auto px-6 py-12">
         {showLoader && (
           <div className="flex justify-center py-12">
             <Loader />
           </div>
         )}
         
-        {/* Errores Globales */}
         {(status === SEARCH_STATUS.ERROR || trendingError) && (
-          <div className="py-10 text-center border border-red-900 bg-red-900/10 mb-8">
-            <h3 className="text-xl font-mono text-red-500">[SYSTEM ERROR]</h3>
-            <p className="text-gray-400 font-mono text-xs mt-2">{error || trendingError}</p>
+          <div className="py-10 text-center border border-red-500 bg-red-100 dark:bg-red-900/10 mb-8 rounded">
+            <h3 className="text-xl font-mono text-red-600 dark:text-red-500">[SYSTEM ERROR]</h3>
+            <p className="text-gray-700 dark:text-gray-400 font-mono text-xs mt-2">{error || trendingError}</p>
           </div>
         )}
 
         {status === SEARCH_STATUS.NO_RESULTS && isSearchMode && (
-          <div className="py-20 text-center border border-gray-800 border-dashed">
-            <h3 className="text-xl font-mono text-gray-500">[NO_DATA_FOUND]</h3>
-            <p className="text-gray-600 font-mono text-sm mt-2">Try a different search term</p>
+          <div className="py-20 text-center border border-gray-300 dark:border-gray-800 border-dashed rounded-lg">
+            <h3 className="text-xl font-mono text-gray-500">[NO DATA FOUND]</h3>
           </div>
         )}
 
         {!showLoader && displayResults.length > 0 && (
-          <div className="space-y-12">
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-mono text-gray-400 uppercase tracking-widest">
-                  {isSearchMode ? 'SEARCH_RESULTS' : 'TRENDING_ARCHIVES'} 
-                  <span className="text-white ml-2">[{isSearchMode ? pagination.totalResults : displayResults.length}]</span>
+          <div className="space-y-20">
+            <div className="space-y-8">
+              <motion.div 
+                className="flex items-center justify-between"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: false }}
+                transition={{ duration: 1.0 }}
+              >
+                <h2 className="text-sm font-mono text-gray-600 dark:text-gray-400 uppercase tracking-widest">
+                  {isSearchMode ? 'SEARCH RESULTS' : 'TRENDING ARCHIVES'} 
+                  <span className="text-black dark:text-white ml-2">[{isSearchMode ? pagination.totalResults : displayResults.length}]</span>
                 </h2>
-                <div className="h-px bg-gray-800 flex-grow ml-4" />
-              </div>
+                <div className="h-px bg-gray-300 dark:bg-gray-800 flex-grow ml-4" />
+              </motion.div>
 
               <motion.div 
-                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
                 initial="hidden"
                 animate="visible"
-                variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
+                variants={{ visible: { transition: { staggerChildren: 0.15 } } }}
               >
                 {displayResults.map((item) => (
-                  <Card 
-                    key={item.imdbID} 
-                    item={item} 
-                    onClick={(id) => navigate(`/movie/${id}`)} 
-                  />
+                  <motion.div
+                    key={item.imdbID}
+                    variants={{
+                      hidden: { opacity: 0, y: 20 },
+                      visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+                    }}
+                  >
+                    <Card 
+                      item={item} 
+                      onClick={(id) => navigate(`/movie/${id}`)} 
+                    />
+                  </motion.div>
                 ))}
               </motion.div>
 
@@ -238,36 +212,28 @@ const HomePage = () => {
                 <div className="flex justify-center pt-8">
                   <button
                     onClick={handleLoadMore}
-                    className="px-8 py-3 font-mono text-sm border border-gray-700 text-gray-400 hover:border-[#ff2e00] hover:text-[#ff2e00] transition-colors uppercase tracking-widest"
+                    className="px-10 py-4 font-mono text-sm border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-[#ff2e00] hover:text-[#ff2e00] transition-colors duration-500 uppercase tracking-widest hover:bg-[#ff2e00]/5"
                   >
-                    LOAD_MORE [{pagination.currentPage}/{pagination.totalPages}]
+                    LOAD MORE [{pagination.currentPage}/{pagination.totalPages}]
                   </button>
                 </div>
               )}
             </div>
 
             {!isSearchMode && (
-              <div className="space-y-12 mt-12">
+              <div className="space-y-20 mt-16">
                 <PopularSection 
-                  title="POPULAR_MOVIES" 
+                  title="POPULAR MOVIES" 
                   type="movie" 
                   navigate={navigate} 
                 />
                 <PopularSection 
-                  title="POPULAR_SERIES" 
+                  title="POPULAR SERIES" 
                   type="series" 
                   navigate={navigate} 
                 />
               </div>
             )}
-          </div>
-        )}
-
-        {/* Fallback si no hay resultados ni búsqueda activa */}
-        {!showLoader && displayResults.length === 0 && !isSearchMode && (
-          <div className="space-y-12 mt-12">
-            <PopularSection title="POPULAR_MOVIES" type="movie" navigate={navigate} />
-            <PopularSection title="POPULAR_SERIES" type="series" navigate={navigate} />
           </div>
         )}
       </section>

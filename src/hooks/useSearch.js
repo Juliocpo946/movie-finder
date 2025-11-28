@@ -89,7 +89,15 @@ export const useSearch = (options = {}) => {
 
     if (response.success && response.data.items) {
       const parsedResults = parseSearchResults({ Search: response.data.items });
-      setResults((prev) => [...prev, ...parsedResults]);
+      
+      // MODIFICADO: Filtrar duplicados antes de añadir al estado
+      setResults((prev) => {
+        const existingIds = new Set(prev.map(item => item.imdbID));
+        const newItems = parsedResults.filter(item => !existingIds.has(item.imdbID));
+        
+        return [...prev, ...newItems];
+      });
+
       setPagination((prev) => ({
         ...prev,
         currentPage: nextPage

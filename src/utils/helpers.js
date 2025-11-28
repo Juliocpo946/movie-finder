@@ -1,5 +1,50 @@
 import { RATING_COLORS, PLACEHOLDER_IMAGE } from './constants';
 
+const GENRE_TRANSLATIONS = {
+  'Action': 'Acción',
+  'Adventure': 'Aventura',
+  'Animation': 'Animación',
+  'Biography': 'Biografía',
+  'Comedy': 'Comedia',
+  'Crime': 'Crimen',
+  'Documentary': 'Documental',
+  'Drama': 'Drama',
+  'Family': 'Familia',
+  'Fantasy': 'Fantasía',
+  'Film-Noir': 'Cine Negro',
+  'History': 'Historia',
+  'Horror': 'Terror',
+  'Music': 'Música',
+  'Musical': 'Musical',
+  'Mystery': 'Misterio',
+  'Romance': 'Romance',
+  'Sci-Fi': 'Ciencia Ficción',
+  'Short': 'Corto',
+  'Sport': 'Deporte',
+  'Thriller': 'Suspenso',
+  'War': 'Guerra',
+  'Western': 'Western'
+};
+
+export const translateGenre = (genreString, language) => {
+  if (!genreString || language === 'en') return genreString;
+  
+  return genreString.split(', ').map(g => GENRE_TRANSLATIONS[g] || g).join(', ');
+};
+
+export const translateType = (type, language) => {
+  if (!type) return '';
+  if (language === 'en') return type;
+
+  const types = {
+    'movie': 'Película',
+    'series': 'Serie',
+    'episode': 'Episodio',
+    'game': 'Juego'
+  };
+  return types[type] || type;
+};
+
 export const getPosterUrl = (poster) => {
   if (!poster || poster === 'N/A') {
     return PLACEHOLDER_IMAGE;
@@ -83,15 +128,6 @@ export const formatYear = (year) => {
   return year.toString().split('–')[0].trim();
 };
 
-export const getTypeLabel = (type) => {
-  const types = {
-    movie: 'Movie',
-    series: 'Series',
-    episode: 'Episode'
-  };
-  return types[type] || type;
-};
-
 export const classNames = (...classes) => {
   return classes.filter(Boolean).join(' ');
 };
@@ -100,11 +136,16 @@ export const isValidImdbId = (id) => {
   return /^tt\d{7,8}$/.test(id);
 };
 
+// MODIFICADO: Ahora filtra duplicados antes de devolver el array
 export const parseSearchResults = (data) => {
   if (!data || !data.Search) {
     return [];
   }
-  return data.Search.map((item) => ({
+  
+  // Usamos un Map para eliminar duplicados basados en imdbID
+  const uniqueItems = Array.from(new Map(data.Search.map(item => [item.imdbID, item])).values());
+
+  return uniqueItems.map((item) => ({
     ...item,
     Poster: getPosterUrl(item.Poster)
   }));
