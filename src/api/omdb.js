@@ -26,7 +26,7 @@ const OMDB_ERRORS = {
 
 const buildUrl = (params = {}) => {
   const url = new URL(BASE_URL);
-  url.searchParams.append('apikey', API_KEY);
+  url.searchParams.append('apikey', API_KEY || '');
   
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
@@ -46,40 +46,64 @@ const handleResponse = async (response) => {
     };
   }
 
-  const data = await response.json();
-
-  if (data.Response === 'False') {
-    return {
-      success: false,
-      message: OMDB_ERRORS[data.Error] || data.Error || 'Unknown error',
-      data: null
-    };
+  try {
+    const data = await response.json();
+    if (data.Response === 'False') {
+      return {
+        success: false,
+        message: OMDB_ERRORS[data.Error] || data.Error || 'Unknown error',
+        data: null
+      };
+    }
+    return { success: true, data, message: 'Success' };
+  } catch (e) {
+    return { success: false, message: 'Invalid JSON response', data: null };
   }
-
-  return {
-    success: true,
-    data,
-    message: 'Success'
-  };
 };
 
 const omdbClient = {
   async search(query, params = {}) {
-    const url = buildUrl({ s: query, ...params });
-    const response = await fetch(url);
-    return handleResponse(response);
+    try {
+      const url = buildUrl({ s: query, ...params });
+      const response = await fetch(url);
+      return handleResponse(response);
+    } catch (error) {
+      console.error("OMDb Search Error:", error);
+      return {
+        success: false,
+        message: error.message || 'Network Error',
+        data: null
+      };
+    }
   },
 
   async getById(imdbId, fullPlot = true) {
-    const url = buildUrl({ i: imdbId, plot: fullPlot ? 'full' : 'short' });
-    const response = await fetch(url);
-    return handleResponse(response);
+    try {
+      const url = buildUrl({ i: imdbId, plot: fullPlot ? 'full' : 'short' });
+      const response = await fetch(url);
+      return handleResponse(response);
+    } catch (error) {
+      console.error("OMDb GetById Error:", error);
+      return {
+        success: false,
+        message: error.message || 'Network Error',
+        data: null
+      };
+    }
   },
 
   async getByTitle(title, params = {}) {
-    const url = buildUrl({ t: title, plot: 'full', ...params });
-    const response = await fetch(url);
-    return handleResponse(response);
+    try {
+      const url = buildUrl({ t: title, plot: 'full', ...params });
+      const response = await fetch(url);
+      return handleResponse(response);
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Network Error',
+        data: null
+      };
+    }
   }
 };
 

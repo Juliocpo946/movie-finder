@@ -13,32 +13,46 @@ import { TYPE_FILTERS } from '../utils/constants';
 import { omdbApi } from '../api';
 import { getPosterUrl } from '../utils';
 
+// Componente ROBUSTO que no se oculta si falla
 const PopularSection = ({ title, type, navigate }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchPopular = async () => {
       setLoading(true);
-      const queries = type === 'movie' 
-        ? ['Batman', 'Spider', 'Star Wars', 'Marvel']
-        : ['Breaking', 'Game of', 'Stranger', 'The Office'];
-      
-      const randomQuery = queries[Math.floor(Math.random() * queries.length)];
-      
-      const response = await omdbApi.search(randomQuery, { type });
-      
-      if (response.success && response.data?.Search) {
-        const parsed = response.data.Search.slice(0, 4).map((item) => ({
-          ...item,
-          Poster: getPosterUrl(item.Poster)
-        }));
-        setItems(parsed);
+      setError(null);
+      try {
+        const queries = type === 'movie' 
+          ? ['Batman', 'Spider', 'Star Wars', 'Marvel']
+          : ['Breaking', 'Game of', 'Stranger', 'The Office'];
+        
+        const randomQuery = queries[Math.floor(Math.random() * queries.length)];
+        const response = await omdbApi.search(randomQuery, { type });
+        
+        if (isMounted) {
+          if (response.success && response.data?.Search) {
+            const parsed = response.data.Search.slice(0, 4).map((item) => ({
+              ...item,
+              Poster: getPosterUrl(item.Poster)
+            }));
+            setItems(parsed);
+          } else {
+            setError(response.message || "No results");
+          }
+        }
+      } catch (err) {
+        if (isMounted) setError(err.message);
+      } finally {
+        if (isMounted) setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchPopular();
+    return () => { isMounted = false; };
   }, [type]);
 
   if (loading) {
@@ -46,19 +60,24 @@ const PopularSection = ({ title, type, navigate }) => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-mono text-gray-400 uppercase tracking-widest">{title}</h2>
-          <div className="h-px bg-gray-800 flex-grow ml-4" />
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-[400px] bg-gray-900 animate-pulse" />
+            <div key={i} className="h-[300px] bg-gray-900 animate-pulse border border-gray-800" />
           ))}
         </div>
       </div>
     );
   }
 
-  if (items.length === 0) {
-    return null;
+  // SI HAY ERROR, LO MOSTRAMOS EN LUGAR DE ESCONDERLO
+  if (items.length === 0 || error) {
+    return (
+      <div className="border border-red-800 bg-red-900/20 p-4 my-4">
+        <h3 className="text-red-500 font-mono text-xs font-bold uppercase">Error loading {title}</h3>
+        <p className="text-gray-400 font-mono text-[10px]">{error || "Unknown error"}</p>
+      </div>
+    );
   }
 
   return (
@@ -86,33 +105,14 @@ const HomePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { addFavorite } = useFavorites();
-  
   const [activeType, setActiveType] = useState('');
   const initialized = useRef(false);
 
-  const { 
-    trending, 
-    featuredMovie, 
-    isLoading: trendingLoading,
-    fetchByQuery 
-  } = useTrending();
-
-  const { 
-    query, 
-    setQuery, 
-    debouncedQuery, 
-    results, 
-    status, 
-    error,
-    pagination,
-    search,
-    loadMore
-  } = useSearch({ debounceDelay: 400 });
+  const { trending, featuredMovie, isLoading: trendingLoading, error: trendingError } = useTrending();
+  const { query, setQuery, debouncedQuery, results, status, error, pagination, search, loadMore } = useSearch({ debounceDelay: 400 });
 
   useEffect(() => {
-    if (!initialized.current) {
-      initialized.current = true;
-    }
+    if (!initialized.current) initialized.current = true;
   }, []);
 
   useEffect(() => {
@@ -126,17 +126,13 @@ const HomePage = () => {
     if (debouncedQuery.length >= 2) {
       search(debouncedQuery, { type });
     } else {
-      fetchByQuery('Avengers', type);
+      // Logic for fallback search could go here
     }
-  }, [debouncedQuery, search, fetchByQuery]);
+  }, [debouncedQuery, search]);
 
   const handleLoadMore = useCallback(() => {
     loadMore(debouncedQuery, { type: activeType });
   }, [debouncedQuery, activeType, loadMore]);
-
-  const handleAddToWatchlist = useCallback((movie) => {
-    addFavorite(movie);
-  }, [addFavorite]);
 
   const isSearchMode = query.length > 0;
   const displayResults = isSearchMode ? results : trending;
@@ -144,6 +140,13 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
+      {/* Diagnóstico de API Key en pantalla */}
+      {!import.meta.env.VITE_OMDB_API_KEY && (
+        <div className="bg-red-600 text-white font-mono text-center text-xs py-2">
+          CRITICAL: VITE_OMDB_API_KEY is missing in .env
+        </div>
+      )}
+
       <AnimatePresence>
         {!isSearchMode && featuredMovie && (
           <motion.div
@@ -152,10 +155,7 @@ const HomePage = () => {
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <Hero 
-              movie={featuredMovie} 
-              onAddToWatchlist={handleAddToWatchlist}
-            />
+            <Hero movie={featuredMovie} onAddToWatchlist={addFavorite} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -168,7 +168,6 @@ const HomePage = () => {
             onChange={(e) => setQuery(e.target.value)}
             className="text-2xl md:text-4xl font-oswald uppercase"
           />
-
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {TYPE_FILTERS.map((filter) => (
               <button
@@ -188,11 +187,17 @@ const HomePage = () => {
       </div>
 
       <section className="max-w-7xl mx-auto px-4 py-12">
-        {showLoader && <Loader />}
+        {showLoader && (
+          <div className="flex justify-center py-12">
+            <Loader />
+          </div>
+        )}
         
-        {status === SEARCH_STATUS.ERROR && (
-          <div className="py-20 text-center border border-red-900 bg-red-900/10">
-            <h3 className="text-xl font-mono text-red-500">[ERROR: {error}]</h3>
+        {/* Errores Globales */}
+        {(status === SEARCH_STATUS.ERROR || trendingError) && (
+          <div className="py-10 text-center border border-red-900 bg-red-900/10 mb-8">
+            <h3 className="text-xl font-mono text-red-500">[SYSTEM ERROR]</h3>
+            <p className="text-gray-400 font-mono text-xs mt-2">{error || trendingError}</p>
           </div>
         )}
 
@@ -242,7 +247,7 @@ const HomePage = () => {
             </div>
 
             {!isSearchMode && (
-              <div className="space-y-12">
+              <div className="space-y-12 mt-12">
                 <PopularSection 
                   title="POPULAR_MOVIES" 
                   type="movie" 
@@ -258,18 +263,11 @@ const HomePage = () => {
           </div>
         )}
 
+        {/* Fallback si no hay resultados ni búsqueda activa */}
         {!showLoader && displayResults.length === 0 && !isSearchMode && (
-          <div className="space-y-12">
-            <PopularSection 
-              title="POPULAR_MOVIES" 
-              type="movie" 
-              navigate={navigate} 
-            />
-            <PopularSection 
-              title="POPULAR_SERIES" 
-              type="series" 
-              navigate={navigate} 
-            />
+          <div className="space-y-12 mt-12">
+            <PopularSection title="POPULAR_MOVIES" type="movie" navigate={navigate} />
+            <PopularSection title="POPULAR_SERIES" type="series" navigate={navigate} />
           </div>
         )}
       </section>
