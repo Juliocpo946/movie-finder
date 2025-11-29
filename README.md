@@ -95,10 +95,13 @@ La aplicacion permite a los usuarios:
 *Pagina de error personalizada con diseno consistente y navegacion de retorno.*
 
 ---
-
 ## Decision Tecnica: TMDB vs OMDb
 
-Aunque el planteamiento inicial del hackathon sugeria el uso de **OMDb API**, este proyecto implementa **TMDB (The Movie Database) API**. Esta decision se fundamenta en las siguientes limitaciones criticas detectadas en OMDb:
+Este proyecto implementa **TMDB (The Movie Database) API** como fuente principal de datos. Esta eleccion esta **explicitamente contemplada en las reglas del hackathon**, donde se menciona en la seccion de "APIs Adicionales (Opcionales)":
+
+> *"TMDB API: Como alternativa o complemento a OMDb"*
+
+La decision de utilizar TMDB como API principal (en lugar de complementaria) se fundamenta en las siguientes limitaciones tecnicas detectadas en OMDb durante la fase de analisis:
 
 ### Limitaciones de OMDb
 
