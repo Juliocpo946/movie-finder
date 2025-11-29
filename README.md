@@ -48,7 +48,7 @@ La aplicacion permite a los usuarios:
 - Alternar entre modo claro y oscuro
 
 **URL de Produccion:** [movie-finder-tau-eight.vercel.app
-](https://movie-finder-git-main-juliocp0s-projects.vercel.app)
+](https://movie-finder-tau-eight.vercel.app/)
 
 **Repositorio:** [https://github.com/Juliocpo946/movie-finder](https://github.com/Juliocpo946/movie-finder)
 
