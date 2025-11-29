@@ -112,13 +112,17 @@ Aunque el planteamiento inicial del hackathon sugeria el uso de **OMDb API**, es
 
 ### Justificacion Detallada
 
+Al estar TMDB listada como API permitida en las reglas oficiales del hackathon, se opto por utilizarla como fuente principal debido a:
+
 1. **Endpoints de Descubrimiento:** OMDb carece de endpoints nativos para obtener "Trending" o "Titulos Similares". TMDB ofrece endpoints especificos que permiten una implementacion real sin datos estaticos.
 
 2. **Calidad de Recursos Graficos:** La interfaz requiere posters y backdrops de alta resolucion. TMDB proporciona multiples tamanios optimizados (`w300`, `w500`, `original`).
 
 3. **Capacidades de Filtrado:** El endpoint `/discover` de TMDB permite combinar multiples parametros (genero, anio, tipo, ordenamiento) en una sola consulta.
 
-4. **Integracion de Trailers:** TMDB incluye datos de videos de YouTube directamente en sus respuestas, permitiendo embeber trailers oficiales.
+4. **Integracion de Trailers:** TMDB incluye datos de videos de YouTube directamente en sus respuestas, permitiendo embeber trailers oficiales sin necesidad de una segunda API.
+
+Esta decision permite cumplir de manera mas robusta con los requerimientos de la rubrica, especialmente en los criterios de "Funcionalidades", "Creatividad" y "Experiencia de Usuario".
 
 ---
 
