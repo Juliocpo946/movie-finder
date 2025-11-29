@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
 import { useFavorites } from '../context/FavoritesContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
-  const { toggleTheme, isDark } = useTheme();
   const { getFavoritesCount } = useFavorites();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
@@ -29,6 +27,7 @@ const Navbar = () => {
           OMDb_TERMINAL
         </Link>
 
+        {/* MENU DESKTOP */}
         <div className="hidden md:flex items-center gap-8">
           {links.map((link) => (
             <Link 
@@ -49,25 +48,10 @@ const Navbar = () => {
               {link.label}
             </Link>
           ))}
-          
-          <div className="flex items-center pl-6 border-l border-gray-300 dark:border-gray-800">
-            <button 
-              onClick={toggleTheme} 
-              className="text-xs font-mono font-bold uppercase transition-colors text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
-            >
-              [{isDark ? 'LIGHT' : 'DARK'}]
-            </button>
-          </div>
         </div>
 
+        {/* MENU MOBILE */}
         <div className="flex items-center gap-4 md:hidden">
-          <button 
-            onClick={toggleTheme} 
-            className="text-xs font-mono font-bold uppercase text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-700 px-2 py-1 rounded"
-          >
-            {isDark ? 'LHT' : 'DRK'}
-          </button>
-
           <button 
             onClick={() => setIsOpen(!isOpen)}
             className="text-black dark:text-white p-1 focus:outline-none z-50"
@@ -90,6 +74,8 @@ const Navbar = () => {
           </button>
         </div>
       </div>
+
+      {/* DROPDOWN MOBILE */}
       <AnimatePresence>
         {isOpen && (
           <motion.div

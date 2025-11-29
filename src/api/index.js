@@ -1,2 +1,2 @@
-export { omdbClient, HTTP_STATUS, OMDB_ERRORS } from './omdb';
+export { tmdbClient } from './tmdb';
 export { omdbApi, CONTENT_TYPES } from './endpoints';

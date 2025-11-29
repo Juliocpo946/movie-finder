@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
-import { omdbApi } from '../api';
+import { tmdbClient } from '../api/tmdb';
 import { useDebounce } from './useDebounce';
-import { parseSearchResults } from '../utils';
+import { normalizeTmdbMovie } from '../utils';
 
 export const SEARCH_STATUS = {
   IDLE: 'idle',
@@ -12,117 +12,65 @@ export const SEARCH_STATUS = {
 };
 
 export const useSearch = (options = {}) => {
-  const { debounceDelay = 400 } = options;
-
-  const [query, setQuery] = useState('');
+  const { debounceDelay = 500 } = options;
   const [results, setResults] = useState([]);
   const [status, setStatus] = useState(SEARCH_STATUS.IDLE);
   const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 0,
-    totalResults: 0
-  });
-  
-  const abortControllerRef = useRef(null);
-  const debouncedQuery = useDebounce(query, debounceDelay);
+  const [pagination, setPagination] = useState({ page: 1, totalPages: 0 });
+  const abortRef = useRef(null);
 
-  const search = useCallback(async (searchTerm, searchOptions = {}) => {
-    if (!searchTerm || searchTerm.trim().length < 2) {
-      setResults([]);
-      setStatus(SEARCH_STATUS.IDLE);
-      return;
+  const performSearch = useCallback(async (query, params, isLoadMore = false) => {
+    if (!query && !params.with_genres && !params.year) return;
+
+    if (!isLoadMore) {
+      if (abortRef.current) abortRef.current.abort();
+      abortRef.current = new AbortController();
+      setStatus(SEARCH_STATUS.LOADING);
     }
 
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    abortControllerRef.current = new AbortController();
+    try {
+      let response;
+      // Si hay filtros complejos usamos 'discover', si es solo texto usamos 'search'
+      if (!query && (params.year || params.with_genres || params.sort_by)) {
+        response = await tmdbClient.discover(params);
+      } else {
+        response = await tmdbClient.search(query, params);
+      }
 
-    setStatus(SEARCH_STATUS.LOADING);
-    setError(null);
-
-    const { page = 1, type = '', year = '' } = searchOptions;
-
-    const response = await omdbApi.searchWithPagination(searchTerm.trim(), {
-      page,
-      type,
-      year
-    });
-
-    if (!response.success) {
-      if (response.message === 'Movie not found' || response.message === 'Too many results - Please refine your search') {
-        setResults([]);
-        setStatus(SEARCH_STATUS.NO_RESULTS);
-        setError(response.message);
+      if (response.success) {
+        const normalized = response.data.results.map(item => normalizeTmdbMovie(item, params.type));
+        
+        if (isLoadMore) {
+          setResults(prev => {
+            const ids = new Set(prev.map(i => i.imdbID));
+            return [...prev, ...normalized.filter(i => !ids.has(i.imdbID))];
+          });
+        } else {
+          setResults(normalized);
+          setStatus(normalized.length > 0 ? SEARCH_STATUS.SUCCESS : SEARCH_STATUS.NO_RESULTS);
+        }
+        
+        setPagination({
+          page: response.data.page,
+          totalPages: response.data.total_pages
+        });
       } else {
         setError(response.message);
         setStatus(SEARCH_STATUS.ERROR);
       }
-      return;
+    } catch (err) {
+      setError(err.message);
+      setStatus(SEARCH_STATUS.ERROR);
     }
-
-    const { items, totalResults, totalPages, currentPage } = response.data;
-
-    if (!items || items.length === 0) {
-      setResults([]);
-      setStatus(SEARCH_STATUS.NO_RESULTS);
-      return;
-    }
-
-    const parsedResults = parseSearchResults({ Search: items });
-    setResults(parsedResults);
-    setPagination({ currentPage, totalPages, totalResults });
-    setStatus(SEARCH_STATUS.SUCCESS);
   }, []);
 
-  const loadMore = useCallback(async (searchTerm, searchOptions = {}) => {
-    if (pagination.currentPage >= pagination.totalPages) {
-      return;
+  const search = useCallback((query, params = {}) => performSearch(query, { page: 1, ...params }), [performSearch]);
+  
+  const loadMore = useCallback((query, params = {}) => {
+    if (pagination.page < pagination.totalPages) {
+      performSearch(query, { ...params, page: pagination.page + 1 }, true);
     }
+  }, [pagination, performSearch]);
 
-    const nextPage = pagination.currentPage + 1;
-    const response = await omdbApi.searchWithPagination(searchTerm.trim(), {
-      ...searchOptions,
-      page: nextPage
-    });
-
-    if (response.success && response.data.items) {
-      const parsedResults = parseSearchResults({ Search: response.data.items });
-      
-      // MODIFICADO: Filtrar duplicados antes de añadir al estado
-      setResults((prev) => {
-        const existingIds = new Set(prev.map(item => item.imdbID));
-        const newItems = parsedResults.filter(item => !existingIds.has(item.imdbID));
-        
-        return [...prev, ...newItems];
-      });
-
-      setPagination((prev) => ({
-        ...prev,
-        currentPage: nextPage
-      }));
-    }
-  }, [pagination]);
-
-  const reset = useCallback(() => {
-    setQuery('');
-    setResults([]);
-    setStatus(SEARCH_STATUS.IDLE);
-    setError(null);
-    setPagination({ currentPage: 1, totalPages: 0, totalResults: 0 });
-  }, []);
-
-  return {
-    query,
-    setQuery,
-    debouncedQuery,
-    results,
-    status,
-    error,
-    pagination,
-    search,
-    loadMore,
-    reset
-  };
+  return { results, status, error, pagination, search, loadMore };
 };

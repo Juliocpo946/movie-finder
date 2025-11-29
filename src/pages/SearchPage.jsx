@@ -1,184 +1,153 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSearch, SEARCH_STATUS } from '../hooks/useSearch';
 import Input from '../components/Input';
 import Card from '../components/Card';
 import Loader from '../components/Loader';
-import { TYPE_FILTERS } from '../utils/constants';
+import { TYPE_FILTERS, TMDB_GENRES, SORT_OPTIONS } from '../utils/constants';
 
 const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   
-  const initialQuery = searchParams.get('q') || '';
-  const initialType = searchParams.get('type') || '';
-  const initialYear = searchParams.get('y') || '';
+  const [query, setQuery] = useState(searchParams.get('q') || '');
+  const [filters, setFilters] = useState({
+    type: searchParams.get('type') || 'movie',
+    year: searchParams.get('year') || '',
+    genre: searchParams.get('genre') || '',
+    sort: searchParams.get('sort') || 'popularity.desc'
+  });
 
-  const [query, setQuery] = useState(initialQuery);
-  const [type, setType] = useState(initialType);
-  const [year, setYear] = useState(initialYear);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+  const { results, status, pagination, search, loadMore } = useSearch();
 
-  const { results, status, error, pagination, search, loadMore } = useSearch({ debounceDelay: 500 });
-
-  // Ejecutar búsqueda cuando cambian los filtros o la query en la URL
   useEffect(() => {
-    const q = searchParams.get('q');
-    const t = searchParams.get('type');
-    const y = searchParams.get('y');
-    
-    if (q) {
-      search(q, { type: t, year: y });
-    }
-  }, [searchParams, search]);
+    const params = {
+      type: filters.type,
+      year: filters.year,
+      with_genres: filters.genre,
+      sort_by: filters.sort
+    };
+    search(query, params);
+  }, [query, filters, search]);
 
-  const handleSearchSubmit = (e) => {
-    if (e.key === 'Enter' && query.trim().length > 0) {
-      updateUrl();
-    }
+  const updateFilters = (key, value) => {
+    setFilters(prev => {
+      const newFilters = { ...prev, [key]: value };
+      const urlParams = { q: query, ...newFilters };
+      // Limpiar claves vacías
+      Object.keys(urlParams).forEach(k => !urlParams[k] && delete urlParams[k]);
+      setSearchParams(urlParams);
+      return newFilters;
+    });
   };
-
-  const updateUrl = () => {
-    const params = { q: query };
-    if (type) params.type = type;
-    if (year) params.y = year;
-    setSearchParams(params);
-  };
-
-  const handleTypeChange = (newType) => {
-    setType(newType);
-    const params = { q: query };
-    if (newType) params.type = newType;
-    if (year) params.y = year;
-    setSearchParams(params);
-  };
-
-  const handleYearChange = (e) => {
-    const val = e.target.value;
-    setYear(val);
-    // Debounce manual para el año podría ser útil, pero aquí aplicamos al Enter o blur para simplicidad
-    // O podemos actualizar URL directamente si queremos reactividad inmediata:
-    if (val.length === 4 || val === '') {
-       const params = { q: query };
-       if (type) params.type = type;
-       if (val) params.y = val;
-       setSearchParams(params);
-    }
-  };
-
-  const handleLoadMore = useCallback(() => {
-    loadMore(query, { type, year });
-  }, [query, type, year, loadMore]);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-[#0a0a0a] pt-24 px-6 pb-20">
       <div className="max-w-7xl mx-auto space-y-8">
-        
-        {/* Header de Búsqueda */}
         <header className="space-y-6">
           <Input
-            placeholder="Search titles..."
+            placeholder="Search TMDB..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleSearchSubmit}
-            className="text-4xl md:text-6xl font-oswald uppercase text-black dark:text-white border-b-2 border-gray-300 dark:border-gray-700"
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSearchParams({ ...filters, q: e.target.value });
+            }}
+            className="text-4xl font-oswald uppercase dark:text-white"
           />
           
-          <div className="flex flex-col md:flex-row gap-6 justify-between items-end border-b border-gray-300 dark:border-gray-800 pb-6">
-            {/* Filtros */}
-            <div className="flex flex-wrap gap-4 items-center">
-              <div className="flex gap-2">
-                {TYPE_FILTERS.map((filter) => (
-                  <button
-                    key={filter.value}
-                    onClick={() => handleTypeChange(filter.value)}
-                    className={`px-4 py-2 text-xs font-mono border transition-all duration-300 uppercase tracking-wider
-                      ${type === filter.value 
-                        ? 'bg-[#ff2e00] border-[#ff2e00] text-white font-bold' 
-                        : 'border-gray-300 dark:border-gray-700 text-gray-500 hover:border-black dark:hover:border-white hover:text-black dark:hover:text-white'
-                      }`}
-                  >
-                    {filter.label}
-                  </button>
-                ))}
-              </div>
-              
-              <div className="relative group">
-                <input 
-                  type="text"
-                  placeholder="YEAR"
-                  value={year}
-                  onChange={handleYearChange}
-                  maxLength={4}
-                  className="w-24 bg-transparent border border-gray-300 dark:border-gray-700 px-3 py-2 text-xs font-mono text-black dark:text-white focus:border-[#ff2e00] outline-none transition-colors text-center uppercase placeholder-gray-500"
-                />
-              </div>
+          <div className="flex flex-wrap gap-4 items-center bg-white dark:bg-gray-900 p-4 rounded-lg shadow-sm">
+            {/* Tipo */}
+            <div className="flex gap-2">
+              {TYPE_FILTERS.map(f => (
+                <button
+                  key={f.value}
+                  onClick={() => updateFilters('type', f.value)}
+                  className={`px-3 py-1 text-xs font-bold uppercase tracking-wider border transition-colors ${
+                    filters.type === f.value 
+                    ? 'bg-[#ff2e00] border-[#ff2e00] text-white' 
+                    : 'border-gray-300 dark:border-gray-700 text-gray-500'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
             </div>
 
-            {/* Toggle View */}
-            <div className="flex gap-2">
-              <button 
-                onClick={() => setViewMode('grid')}
-                className={`p-2 transition-colors ${viewMode === 'grid' ? 'text-[#ff2e00]' : 'text-gray-400 hover:text-black dark:hover:text-white'}`}
-              >
-                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 10h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 16h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4z"/></svg>
-              </button>
-              <button 
-                onClick={() => setViewMode('list')}
-                className={`p-2 transition-colors ${viewMode === 'list' ? 'text-[#ff2e00]' : 'text-gray-400 hover:text-black dark:hover:text-white'}`}
-              >
-                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
-              </button>
-            </div>
+            {/* Géneros */}
+            <select 
+              value={filters.genre}
+              onChange={(e) => updateFilters('genre', e.target.value)}
+              className="bg-transparent border border-gray-300 dark:border-gray-700 text-xs font-mono p-2 rounded dark:text-white"
+            >
+              <option value="">ALL GENRES</option>
+              {TMDB_GENRES.map(g => (
+                <option key={g.id} value={g.id}>{g.name}</option>
+              ))}
+            </select>
+
+            {/* Año */}
+            <input 
+              type="number" 
+              placeholder="YEAR"
+              value={filters.year}
+              onChange={(e) => updateFilters('year', e.target.value)}
+              className="w-20 bg-transparent border border-gray-300 dark:border-gray-700 text-xs font-mono p-2 rounded dark:text-white text-center"
+            />
+
+            {/* Ordenamiento */}
+            <select 
+              value={filters.sort}
+              onChange={(e) => updateFilters('sort', e.target.value)}
+              className="bg-transparent border border-gray-300 dark:border-gray-700 text-xs font-mono p-2 rounded dark:text-white"
+            >
+              {SORT_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
           </div>
         </header>
 
-        {/* Resultados */}
         {status === SEARCH_STATUS.LOADING && <Loader />}
         
-        {status === SEARCH_STATUS.ERROR && (
-          <div className="py-20 text-center">
-            <h3 className="text-xl font-mono text-red-500 uppercase">[ERROR: {error}]</h3>
-          </div>
-        )}
-
-        {status === SEARCH_STATUS.NO_RESULTS && (
-          <div className="py-32 text-center border-2 border-dashed border-gray-300 dark:border-gray-800">
-            <h3 className="text-2xl font-mono text-gray-500">[NO RESULTS FOUND]</h3>
-            <p className="text-gray-400 mt-2 font-mono text-sm">Try adjusting your filters or search query</p>
-          </div>
-        )}
-
         {results.length > 0 && (
           <motion.div 
-            className="space-y-12"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
+            className="space-y-8"
           >
-            <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1'}`}>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
               {results.map((item) => (
                 <Card 
                   key={item.imdbID} 
                   item={item} 
-                  viewMode={viewMode}
                   onClick={(id) => navigate(`/movie/${id}`)} 
                 />
               ))}
             </div>
-
-            {pagination.currentPage < pagination.totalPages && (
-              <div className="flex justify-center pt-8">
+            
+            {pagination.page < pagination.totalPages && (
+              <div className="text-center pt-8">
                 <button
-                  onClick={handleLoadMore}
-                  className="px-12 py-4 font-mono text-sm border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-[#ff2e00] hover:text-[#ff2e00] transition-colors duration-500 uppercase tracking-widest"
+                  onClick={() => loadMore(query, { 
+                    type: filters.type, 
+                    year: filters.year, 
+                    with_genres: filters.genre,
+                    sort_by: filters.sort 
+                  })}
+                  className="px-8 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-mono uppercase hover:border-[#ff2e00] transition-colors dark:text-white"
                 >
-                  LOAD MORE [{pagination.currentPage}/{pagination.totalPages}]
+                  Load More Results
                 </button>
               </div>
             )}
           </motion.div>
+        )}
+        
+        {status === SEARCH_STATUS.NO_RESULTS && (
+          <div className="py-20 text-center text-gray-500 font-mono">
+            NO DATA FOUND IN SECTOR
+          </div>
         )}
       </div>
     </div>

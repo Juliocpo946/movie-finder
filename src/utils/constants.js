@@ -1,15 +1,14 @@
 export const CONTENT_TYPES = {
-  ALL: '',
+  ALL: 'all',
   MOVIE: 'movie',
-  SERIES: 'series',
-  EPISODE: 'episode'
+  SERIES: 'tv'
 };
 
 export const SORT_OPTIONS = [
-  { value: 'year_desc', label: 'Newest First' },
-  { value: 'year_asc', label: 'Oldest First' },
-  { value: 'title_asc', label: 'Title A-Z' },
-  { value: 'title_desc', label: 'Title Z-A' }
+  { value: 'popularity.desc', label: 'Most Popular' },
+  { value: 'vote_average.desc', label: 'Top Rated' },
+  { value: 'primary_release_date.desc', label: 'Newest' },
+  { value: 'primary_release_date.asc', label: 'Oldest' }
 ];
 
 export const VIEW_MODES = {
@@ -20,8 +19,6 @@ export const VIEW_MODES = {
 export const STORAGE_KEYS = {
   FAVORITES: 'movie_finder_favorites',
   THEME: 'movie_finder_theme',
-  VIEW_MODE: 'movie_finder_view_mode',
-  SEARCH_HISTORY: 'movie_finder_search_history'
 };
 
 export const THEMES = {
@@ -29,15 +26,29 @@ export const THEMES = {
   LIGHT: 'light'
 };
 
-export const PAGINATION = {
-  DEFAULT_PAGE: 1,
-  ITEMS_PER_PAGE: 10
-};
+export const TMDB_GENRES = [
+  { id: 28, name: "Action" },
+  { id: 12, name: "Adventure" },
+  { id: 16, name: "Animation" },
+  { id: 35, name: "Comedy" },
+  { id: 80, name: "Crime" },
+  { id: 99, name: "Documentary" },
+  { id: 18, name: "Drama" },
+  { id: 10751, name: "Family" },
+  { id: 14, name: "Fantasy" },
+  { id: 36, name: "History" },
+  { id: 27, name: "Horror" },
+  { id: 10402, name: "Music" },
+  { id: 9648, name: "Mystery" },
+  { id: 10749, name: "Romance" },
+  { id: 878, name: "Sci-Fi" },
+  { id: 53, name: "Thriller" },
+  { id: 10752, name: "War" },
+  { id: 37, name: "Western" }
+];
 
 export const CACHE_DURATION = 5 * 60 * 1000;
-
-export const DEBOUNCE_DELAY = 400;
-
+export const DEBOUNCE_DELAY = 500;
 export const PLACEHOLDER_IMAGE = 'https://placehold.co/300x450/1a1a1a/ededed?text=No+Poster';
 
 export const RATING_COLORS = {
@@ -50,12 +61,10 @@ export const BREAKPOINTS = {
   SM: 640,
   MD: 768,
   LG: 1024,
-  XL: 1280,
-  XXL: 1536
+  XL: 1280
 };
 
 export const TYPE_FILTERS = [
-  { label: 'ALL', value: '' },
   { label: 'MOVIES', value: 'movie' },
-  { label: 'SERIES', value: 'series' }
+  { label: 'SERIES', value: 'tv' }
 ];

@@ -1,13 +1,18 @@
 import { motion } from 'framer-motion';
 import { getPosterUrl } from '../utils';
 
-const Card = ({ item, onClick, viewMode = 'grid' }) => {
+const Card = ({ item, onClick, viewMode = 'grid', sectionPrefix = '' }) => {
   const posterUrl = getPosterUrl(item.Poster);
   const isList = viewMode === 'list';
   
+  // SOLUCIÓN AL BUG DE HUECOS:
+  // Si pasamos un prefijo, lo usamos para crear un ID único de animación.
+  // Si no, usamos el ID normal (esto permite la transición suave a la página de detalles).
+  const cardLayoutId = sectionPrefix ? `${sectionPrefix}-${item.imdbID}` : item.imdbID;
+  
   return (
     <motion.div
-      layoutId={item.imdbID}
+      layoutId={cardLayoutId}
       onClick={() => onClick(item.imdbID)}
       className={`group relative cursor-pointer overflow-hidden bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-white/5 
         ${isList ? 'flex h-48 w-full' : 'h-[400px] w-full'}`}

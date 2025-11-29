@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTrending } from '../hooks/useTrending';
 import { useFavorites } from '../context/FavoritesContext';
@@ -8,38 +7,34 @@ import Card from '../components/Card';
 import Loader from '../components/Loader';
 import Hero from '../components/Hero';
 import { useNavigate } from 'react-router-dom';
-import { omdbApi } from '../api';
-import { getPosterUrl, parseSearchResults } from '../utils';
+import { tmdbClient } from '../api/tmdb';
+import { normalizeTmdbMovie } from '../utils';
 
-const PopularSection = ({ title, type, navigate }) => {
+// Recibimos un 'sectionId' para pasarlo al Card como prefijo
+const PopularSection = ({ title, type, navigate, sectionId }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
 
     const fetchPopular = async () => {
       setLoading(true);
-      setError(null);
       try {
-        const queries = type === 'movie' 
-          ? ['Batman', 'Spider', 'Star Wars', 'Marvel']
-          : ['Breaking', 'Game of', 'Stranger', 'The Office'];
+        const response = await tmdbClient.discover({ 
+          type: type === 'movie' ? 'movie' : 'tv',
+          sort_by: 'popularity.desc',
+          page: 1 
+        });
         
-        const randomQuery = queries[Math.floor(Math.random() * queries.length)];
-        const response = await omdbApi.search(randomQuery, { type });
-        
-        if (isMounted) {
-          if (response.success && response.data?.Search) {
-            const parsed = parseSearchResults(response.data).slice(0, 4);
-            setItems(parsed);
-          } else {
-            setError(response.message || "No results");
-          }
+        if (isMounted && response.success) {
+          const parsed = response.data.results
+            .slice(0, 4)
+            .map(item => normalizeTmdbMovie(item, type === 'movie' ? 'movie' : 'tv'));
+          setItems(parsed);
         }
       } catch (err) {
-        if (isMounted) setError(err.message);
+        console.error(err);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -49,7 +44,7 @@ const PopularSection = ({ title, type, navigate }) => {
     return () => { isMounted = false; };
   }, [type]);
 
-  if (loading || items.length === 0 || error) return null;
+  if (loading || items.length === 0) return null;
 
   return (
     <motion.div 
@@ -61,7 +56,7 @@ const PopularSection = ({ title, type, navigate }) => {
     >
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-oswald text-gray-900 dark:text-white uppercase tracking-widest border-l-4 border-[#ff2e00] pl-4">
-          {title} <span className="text-gray-500 text-sm ml-2">[{items.length}]</span>
+          {title}
         </h2>
         <div className="h-px bg-gray-300 dark:bg-gray-800 flex-grow ml-6" />
       </div>
@@ -70,6 +65,7 @@ const PopularSection = ({ title, type, navigate }) => {
           <Card 
             key={item.imdbID} 
             item={item} 
+            sectionPrefix={sectionId} // Prefijo único para evitar conflictos
             onClick={(id) => navigate(`/movie/${id}`)} 
           />
         ))}
@@ -150,14 +146,26 @@ const HomePage = () => {
                   <Card 
                     key={item.imdbID} 
                     item={item} 
+                    // No ponemos prefijo aquí para que la animación hacia DetailPage sea suave (morph)
+                    // Las otras secciones sí llevarán prefijo.
                     onClick={(id) => navigate(`/movie/${id}`)} 
                   />
                 ))}
               </div>
             </motion.div>
 
-            <PopularSection title="POPULAR MOVIES" type="movie" navigate={navigate} />
-            <PopularSection title="POPULAR SERIES" type="series" navigate={navigate} />
+            <PopularSection 
+              title="POPULAR MOVIES" 
+              type="movie" 
+              sectionId="pop-movies" 
+              navigate={navigate} 
+            />
+            <PopularSection 
+              title="POPULAR SERIES" 
+              type="tv" 
+              sectionId="pop-series" 
+              navigate={navigate} 
+            />
           </div>
         )}
       </section>
