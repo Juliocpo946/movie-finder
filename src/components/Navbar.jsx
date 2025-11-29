@@ -24,7 +24,7 @@ const Navbar = () => {
           onClick={() => setIsOpen(false)}
         >
           <span className="w-3 h-3 bg-[#ff2e00] animate-pulse" />
-          OMDb_TERMINAL
+          TMDb_TERMINAL
         </Link>
 
         {/* MENU DESKTOP */}

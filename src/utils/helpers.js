@@ -11,7 +11,7 @@ export const normalizeTmdbMovie = (item, type = 'movie') => {
   const year = date !== 'N/A' ? date.split('-')[0] : 'N/A';
   
   return {
-    imdbID: item.id.toString(), // TMDB usa IDs numéricos, los convertimos a string
+    imdbID: item.id.toString(),
     Title: title,
     Year: year,
     Type: isTv ? 'series' : 'movie',
@@ -23,7 +23,10 @@ export const normalizeTmdbMovie = (item, type = 'movie') => {
     Director: getCrewMember(item.credits, 'Director'),
     Actors: getCastMembers(item.credits),
     Runtime: item.runtime ? `${item.runtime} min` : (item.episode_run_time?.[0] ? `${item.episode_run_time[0]} min` : 'N/A'),
-    Videos: item.videos?.results || []
+    Videos: item.videos?.results || [],
+    Similar: item.similar?.results 
+      ? item.similar.results.slice(0, 4).map(sim => normalizeTmdbMovie(sim, isTv ? 'tv' : 'movie')) 
+      : []
   };
 };
 

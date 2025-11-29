@@ -1,6 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
 import { tmdbClient } from '../api/tmdb';
-import { useDebounce } from './useDebounce';
 import { normalizeTmdbMovie } from '../utils';
 
 export const SEARCH_STATUS = {
@@ -12,25 +11,34 @@ export const SEARCH_STATUS = {
 };
 
 export const useSearch = (options = {}) => {
-  const { debounceDelay = 500 } = options;
   const [results, setResults] = useState([]);
   const [status, setStatus] = useState(SEARCH_STATUS.IDLE);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ page: 1, totalPages: 0 });
+  
+  // useRef mantiene la referencia entre renderizados sin causar re-render
+  // Lo usamos para guardar el controlador de la petición actual
   const abortRef = useRef(null);
 
   const performSearch = useCallback(async (query, params, isLoadMore = false) => {
+    // Validación básica: no buscar si no hay query ni filtros
     if (!query && !params.with_genres && !params.year) return;
 
     if (!isLoadMore) {
-      if (abortRef.current) abortRef.current.abort();
+      // PATRÓN DE CANCELACIÓN (Debouncing/Cleanup):
+      // Si existe una petición en curso (abortRef.current), la cancelamos.
+      // Esto evita "Race Conditions" donde una petición antigua sobrescribe a la nueva.
+      if (abortRef.current) {
+        abortRef.current.abort();
+      }
+      // Creamos un nuevo controlador para la petición actual
       abortRef.current = new AbortController();
       setStatus(SEARCH_STATUS.LOADING);
     }
 
     try {
       let response;
-      // Si hay filtros complejos usamos 'discover', si es solo texto usamos 'search'
+      // Selección de estrategia: 'discover' para filtros avanzados, 'search' para texto
       if (!query && (params.year || params.with_genres || params.sort_by)) {
         response = await tmdbClient.discover(params);
       } else {
@@ -41,6 +49,7 @@ export const useSearch = (options = {}) => {
         const normalized = response.data.results.map(item => normalizeTmdbMovie(item, params.type));
         
         if (isLoadMore) {
+          // Si es paginación, concatenamos evitando duplicados por ID
           setResults(prev => {
             const ids = new Set(prev.map(i => i.imdbID));
             return [...prev, ...normalized.filter(i => !ids.has(i.imdbID))];
@@ -59,6 +68,9 @@ export const useSearch = (options = {}) => {
         setStatus(SEARCH_STATUS.ERROR);
       }
     } catch (err) {
+      // Ignoramos errores causados por nuestra propia cancelación
+      if (err.name === 'AbortError') return;
+      
       setError(err.message);
       setStatus(SEARCH_STATUS.ERROR);
     }

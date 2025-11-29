@@ -6,7 +6,8 @@ const NotFoundPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-6 bg-gray-100 dark:bg-[#0a0a0a]">
+    // SE AGREGO 'pt-32' para evitar el Navbar y 'min-h-screen' para altura completa
+    <div className="min-h-screen pt-32 flex flex-col items-center justify-center text-center px-6 bg-gray-100 dark:bg-[#0a0a0a]">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

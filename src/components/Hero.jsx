@@ -23,10 +23,13 @@ const Hero = ({ movie }) => {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 2.0, ease: "easeOut" }}
       >
+        {/* OPTIMIZACIÓN DE IMAGEN: Priority High para mejorar el LCP score */}
         <img 
           src={posterUrl} 
           alt={movie.Title}
           className="w-full h-full object-cover opacity-50 blur-sm"
+          loading="eager"        // Cargar inmediatamente
+          fetchPriority="high"   // Prioridad alta en la red
           onError={(e) => {
             e.target.style.display = 'none';
           }}

@@ -11,6 +11,9 @@ const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   
+  // Estado para controlar la vista Grid/Lista
+  const [viewMode, setViewMode] = useState('grid');
+  
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [filters, setFilters] = useState({
     type: searchParams.get('type') || 'movie',
@@ -54,57 +57,91 @@ const SearchPage = () => {
               setSearchParams({ ...filters, q: e.target.value });
             }}
             className="text-4xl font-oswald uppercase dark:text-white"
+            aria-label="Search movies and series" // ACCESIBILIDAD
           />
           
-          <div className="flex flex-wrap gap-4 items-center bg-white dark:bg-gray-900 p-4 rounded-lg shadow-sm">
-            {/* Tipo */}
-            <div className="flex gap-2">
-              {TYPE_FILTERS.map(f => (
-                <button
-                  key={f.value}
-                  onClick={() => updateFilters('type', f.value)}
-                  className={`px-3 py-1 text-xs font-bold uppercase tracking-wider border transition-colors ${
-                    filters.type === f.value 
-                    ? 'bg-[#ff2e00] border-[#ff2e00] text-white' 
-                    : 'border-gray-300 dark:border-gray-700 text-gray-500'
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
+          <div className="flex flex-col md:flex-row gap-4 justify-between bg-white dark:bg-gray-900 p-4 rounded-lg shadow-sm">
+            
+            {/* Filtros */}
+            <div className="flex flex-wrap gap-4 items-center">
+              {/* Tipo */}
+              <div className="flex gap-2" role="group" aria-label="Filter by type">
+                {TYPE_FILTERS.map(f => (
+                  <button
+                    key={f.value}
+                    onClick={() => updateFilters('type', f.value)}
+                    className={`px-3 py-1 text-xs font-bold uppercase tracking-wider border transition-colors ${
+                      filters.type === f.value 
+                      ? 'bg-[#ff2e00] border-[#ff2e00] text-white' 
+                      : 'border-gray-300 dark:border-gray-700 text-gray-500'
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Géneros */}
+              <select 
+                value={filters.genre}
+                onChange={(e) => updateFilters('genre', e.target.value)}
+                className="bg-transparent border border-gray-300 dark:border-gray-700 text-xs font-mono p-2 rounded dark:text-white"
+                aria-label="Filter by genre"
+              >
+                <option value="">ALL GENRES</option>
+                {TMDB_GENRES.map(g => (
+                  <option key={g.id} value={g.id}>{g.name}</option>
+                ))}
+              </select>
+
+              {/* Año */}
+              <input 
+                type="number" 
+                placeholder="YEAR"
+                value={filters.year}
+                onChange={(e) => updateFilters('year', e.target.value)}
+                className="w-20 bg-transparent border border-gray-300 dark:border-gray-700 text-xs font-mono p-2 rounded dark:text-white text-center"
+                aria-label="Filter by year"
+              />
+
+              {/* Ordenamiento */}
+              <select 
+                value={filters.sort}
+                onChange={(e) => updateFilters('sort', e.target.value)}
+                className="bg-transparent border border-gray-300 dark:border-gray-700 text-xs font-mono p-2 rounded dark:text-white"
+                aria-label="Sort results"
+              >
+                {SORT_OPTIONS.map(o => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
             </div>
 
-            {/* Géneros */}
-            <select 
-              value={filters.genre}
-              onChange={(e) => updateFilters('genre', e.target.value)}
-              className="bg-transparent border border-gray-300 dark:border-gray-700 text-xs font-mono p-2 rounded dark:text-white"
-            >
-              <option value="">ALL GENRES</option>
-              {TMDB_GENRES.map(g => (
-                <option key={g.id} value={g.id}>{g.name}</option>
-              ))}
-            </select>
-
-            {/* Año */}
-            <input 
-              type="number" 
-              placeholder="YEAR"
-              value={filters.year}
-              onChange={(e) => updateFilters('year', e.target.value)}
-              className="w-20 bg-transparent border border-gray-300 dark:border-gray-700 text-xs font-mono p-2 rounded dark:text-white text-center"
-            />
-
-            {/* Ordenamiento */}
-            <select 
-              value={filters.sort}
-              onChange={(e) => updateFilters('sort', e.target.value)}
-              className="bg-transparent border border-gray-300 dark:border-gray-700 text-xs font-mono p-2 rounded dark:text-white"
-            >
-              {SORT_OPTIONS.map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
+            {/* Toggle Grid/List - ACCESIBILIDAD MEJORADA */}
+            <div className="flex items-center gap-2 border-l border-gray-300 dark:border-gray-700 pl-4">
+              <button 
+                onClick={() => setViewMode('grid')}
+                className={`p-2 transition-colors ${viewMode === 'grid' ? 'text-[#ff2e00]' : 'text-gray-400'}`}
+                title="Grid View"
+                aria-label="Switch to grid view"
+                aria-pressed={viewMode === 'grid'}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M4 4h7v7H4V4zm0 9h7v7H4v-7zm9-9h7v7h-7V4zm0 9h7v7h-7v-7z" />
+                </svg>
+              </button>
+              <button 
+                onClick={() => setViewMode('list')}
+                className={`p-2 transition-colors ${viewMode === 'list' ? 'text-[#ff2e00]' : 'text-gray-400'}`}
+                title="List View"
+                aria-label="Switch to list view"
+                aria-pressed={viewMode === 'list'}
+              >
+                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M4 5h16v2H4V5zm0 6h16v2H4v-2zm0 6h16v2H4v-2z" />
+                </svg>
+              </button>
+            </div>
           </div>
         </header>
 
@@ -116,11 +153,17 @@ const SearchPage = () => {
             animate={{ opacity: 1 }}
             className="space-y-8"
           >
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            {/* Contenedor condicional según viewMode */}
+            <div className={
+              viewMode === 'grid' 
+                ? "grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6"
+                : "flex flex-col gap-4 max-w-4xl mx-auto"
+            }>
               {results.map((item) => (
                 <Card 
                   key={item.imdbID} 
                   item={item} 
+                  viewMode={viewMode} // Pasamos la prop al Card
                   onClick={(id) => navigate(`/movie/${id}`)} 
                 />
               ))}

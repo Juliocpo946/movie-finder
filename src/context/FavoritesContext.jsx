@@ -5,10 +5,15 @@ import { STORAGE_KEYS } from '../utils';
 const FavoritesContext = createContext(null);
 
 const FavoritesProvider = ({ children }) => {
+  // Lazy Initialization: Pasamos una función a useState.
+  // Esto asegura que la lectura de localStorage (que es lenta/síncrona) 
+  // solo ocurra una vez al montar el componente, no en cada render.
   const [favorites, setFavorites] = useState(() => {
     return storageService.get(STORAGE_KEYS.FAVORITES, []);
   });
 
+  // Efecto de Persistencia: Cada vez que 'favorites' cambia,
+  // actualizamos automáticamente el localStorage.
   useEffect(() => {
     storageService.set(STORAGE_KEYS.FAVORITES, favorites);
   }, [favorites]);
@@ -18,13 +23,8 @@ const FavoritesProvider = ({ children }) => {
   }, [favorites]);
 
   const addFavorite = useCallback((item) => {
-    if (!item || !item.imdbID) {
-      return { success: false };
-    }
-
-    if (isFavorite(item.imdbID)) {
-      return { success: false };
-    }
+    if (!item || !item.imdbID) return { success: false };
+    if (isFavorite(item.imdbID)) return { success: false };
 
     const favoriteItem = {
       imdbID: item.imdbID,
@@ -40,10 +40,7 @@ const FavoritesProvider = ({ children }) => {
   }, [isFavorite]);
 
   const removeFavorite = useCallback((imdbID) => {
-    if (!imdbID) {
-      return { success: false };
-    }
-
+    if (!imdbID) return { success: false };
     setFavorites((prev) => prev.filter((item) => item.imdbID !== imdbID));
     return { success: true };
   }, []);
@@ -60,23 +57,16 @@ const FavoritesProvider = ({ children }) => {
     return { success: true };
   }, []);
 
-  const getFavoritesByType = useCallback((type) => {
-    if (!type) {
-      return favorites;
-    }
-    return favorites.filter((item) => item.Type === type);
-  }, [favorites]);
-
-  const getFavoritesCount = useCallback(() => {
-    return favorites.length;
-  }, [favorites]);
-
   const getMoviesCount = useCallback(() => {
     return favorites.filter((item) => item.Type === 'movie').length;
   }, [favorites]);
 
   const getSeriesCount = useCallback(() => {
-    return favorites.filter((item) => item.Type === 'series').length;
+    return favorites.filter((item) => item.Type === 'series' || item.Type === 'tv').length;
+  }, [favorites]);
+
+  const getFavoritesCount = useCallback(() => {
+    return favorites.length;
   }, [favorites]);
 
   const value = {
@@ -86,7 +76,6 @@ const FavoritesProvider = ({ children }) => {
     removeFavorite,
     toggleFavorite,
     clearFavorites,
-    getFavoritesByType,
     getFavoritesCount,
     getMoviesCount,
     getSeriesCount
@@ -101,11 +90,9 @@ const FavoritesProvider = ({ children }) => {
 
 const useFavorites = () => {
   const context = useContext(FavoritesContext);
-  
   if (!context) {
     throw new Error('useFavorites must be used within FavoritesProvider');
   }
-  
   return context;
 };
 
