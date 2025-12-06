@@ -75,5 +75,23 @@ export const tmdbClient = {
     } catch (error) {
       return { success: false, message: error.message };
     }
+  },
+
+  async getUpcoming() {
+    try {
+      const response = await fetch(`${BASE_URL}/movie/upcoming?language=en-US&page=1`, { headers });
+      return handleResponse(response);
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  },
+
+  async getPopularPeople() {
+    try {
+      const response = await fetch(`${BASE_URL}/person/popular?language=en-US&page=1`, { headers });
+      return handleResponse(response);
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
   }
 };

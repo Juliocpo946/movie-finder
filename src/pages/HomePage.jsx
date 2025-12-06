@@ -1,78 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useTrending } from '../hooks/useTrending';
 import { useFavorites } from '../context/FavoritesContext';
+
 import Input from '../components/Input';
 import Card from '../components/Card';
 import Loader from '../components/Loader';
 import Hero from '../components/Hero';
-import { useNavigate } from 'react-router-dom';
-import { tmdbClient } from '../api/tmdb';
-import { normalizeTmdbMovie } from '../utils';
 
-// Recibimos un 'sectionId' para pasarlo al Card como prefijo
-const PopularSection = ({ title, type, navigate, sectionId }) => {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchPopular = async () => {
-      setLoading(true);
-      try {
-        const response = await tmdbClient.discover({ 
-          type: type === 'movie' ? 'movie' : 'tv',
-          sort_by: 'popularity.desc',
-          page: 1 
-        });
-        
-        if (isMounted && response.success) {
-          const parsed = response.data.results
-            .slice(0, 4)
-            .map(item => normalizeTmdbMovie(item, type === 'movie' ? 'movie' : 'tv'));
-          setItems(parsed);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    fetchPopular();
-    return () => { isMounted = false; };
-  }, [type]);
-
-  if (loading || items.length === 0) return null;
-
-  return (
-    <motion.div 
-      className="space-y-8"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: false, amount: 0.1 }}
-      transition={{ duration: 1.2 }}
-    >
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-oswald text-gray-900 dark:text-white uppercase tracking-widest border-l-4 border-[#ff2e00] pl-4">
-          {title}
-        </h2>
-        <div className="h-px bg-gray-300 dark:bg-gray-800 flex-grow ml-6" />
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {items.map((item) => (
-          <Card 
-            key={item.imdbID} 
-            item={item} 
-            sectionPrefix={sectionId} // Prefijo único para evitar conflictos
-            onClick={(id) => navigate(`/movie/${id}`)} 
-          />
-        ))}
-      </div>
-    </motion.div>
-  );
-};
+import Ticker from '../components/Ticker';
+import Directories from '../components/Directories';
+import ActiveOperatives from '../components/ActiveOperatives';
+import IncomingSignals from '../components/IncomingSignals';
+import PopularSection from '../components/PopularSection';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -102,8 +43,8 @@ const HomePage = () => {
         )}
       </AnimatePresence>
 
-      <div className="sticky top-20 z-40 bg-white/90 dark:bg-[#0a0a0a]/95 backdrop-blur-md border-b border-gray-200 dark:border-white/10 py-6 px-4 transition-all duration-500">
-        <div className="max-w-7xl mx-auto">
+      <div className="sticky top-20 z-40 bg-white/90 dark:bg-[#0a0a0a]/95 backdrop-blur-md border-b border-gray-200 dark:border-white/10 transition-all duration-500">
+        <div className="max-w-7xl mx-auto py-6 px-4">
           <Input
             placeholder="Search movies and series (Press Enter)..."
             value={query}
@@ -112,9 +53,10 @@ const HomePage = () => {
             className="text-2xl md:text-4xl font-oswald uppercase text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-600 border-gray-300 dark:border-gray-700"
           />
         </div>
+        <Ticker />
       </div>
 
-      <section className="max-w-7xl mx-auto px-6 py-12">
+      <section className="max-w-7xl mx-auto px-6 py-12 space-y-24">
         {trendingLoading && <Loader />}
         
         {trendingError && (
@@ -125,13 +67,13 @@ const HomePage = () => {
         )}
 
         {!trendingLoading && (
-          <div className="space-y-20 mt-16">
+          <>
             <motion.div 
               className="space-y-8"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: false }}
-              transition={{ duration: 1.0 }}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.1 }} 
+              transition={{ duration: 0.8 }}
             >
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-mono text-gray-600 dark:text-gray-400 uppercase tracking-widest">
@@ -146,13 +88,17 @@ const HomePage = () => {
                   <Card 
                     key={item.imdbID} 
                     item={item} 
-                    // No ponemos prefijo aquí para que la animación hacia DetailPage sea suave (morph)
-                    // Las otras secciones sí llevarán prefijo.
                     onClick={(id) => navigate(`/movie/${id}`)} 
                   />
                 ))}
               </div>
             </motion.div>
+            
+            <Directories navigate={navigate} />
+
+            <IncomingSignals navigate={navigate} />
+
+            <ActiveOperatives />
 
             <PopularSection 
               title="POPULAR MOVIES" 
@@ -166,7 +112,7 @@ const HomePage = () => {
               sectionId="pop-series" 
               navigate={navigate} 
             />
-          </div>
+          </>
         )}
       </section>
     </div>

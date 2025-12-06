@@ -5,18 +5,30 @@ import { STORAGE_KEYS } from '../utils';
 const FavoritesContext = createContext(null);
 
 const FavoritesProvider = ({ children }) => {
-  // Lazy Initialization: Pasamos una función a useState.
-  // Esto asegura que la lectura de localStorage (que es lenta/síncrona) 
-  // solo ocurra una vez al montar el componente, no en cada render.
+  // Initialization from Storage
   const [favorites, setFavorites] = useState(() => {
     return storageService.get(STORAGE_KEYS.FAVORITES, []);
   });
 
-  // Efecto de Persistencia: Cada vez que 'favorites' cambia,
-  // actualizamos automáticamente el localStorage.
+  // Persist changes to Storage whenever 'favorites' state changes
   useEffect(() => {
     storageService.set(STORAGE_KEYS.FAVORITES, favorites);
   }, [favorites]);
+
+  // SYNC FIX: Listen for changes in other tabs
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      // Only react if the specific key changed
+      if (e.key === STORAGE_KEYS.FAVORITES) {
+        // Parse the new value or default to empty array
+        const newFavorites = e.newValue ? JSON.parse(e.newValue) : [];
+        setFavorites(newFavorites);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const isFavorite = useCallback((imdbID) => {
     return favorites.some((item) => item.imdbID === imdbID);

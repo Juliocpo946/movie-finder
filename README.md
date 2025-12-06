@@ -1,6 +1,7 @@
+
 # TMDB Terminal
 
-**Explorador de Cine y Television**
+**Explorador de Cine y Televisión**
 
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 ![React](https://img.shields.io/badge/React-19.2.0-61DAFB?logo=react&logoColor=white)
@@ -12,172 +13,201 @@
 
 ## Tabla de Contenidos
 
-1. [Descripcion General](#descripcion-general)
-2. [Capturas de Pantalla](#capturas-de-pantalla)
-3. [Decision Tecnica: TMDB vs OMDb](#decision-tecnica-tmdb-vs-omdb)
-4. [Caracteristicas Principales](#caracteristicas-principales)
-5. [Stack Tecnologico](#stack-tecnologico)
-6. [Arquitectura del Proyecto](#arquitectura-del-proyecto)
-7. [Instalacion y Configuracion](#instalacion-y-configuracion)
-8. [Variables de Entorno](#variables-de-entorno)
-9. [Scripts Disponibles](#scripts-disponibles)
-10. [Estructura de Directorios](#estructura-de-directorios)
-11. [Componentes Principales](#componentes-principales)
-12. [Custom Hooks](#custom-hooks)
-13. [Servicios](#servicios)
-14. [Optimizaciones de Rendimiento](#optimizaciones-de-rendimiento)
-15. [Accesibilidad](#accesibilidad)
-16. [Responsividad](#responsividad)
-17. [Despliegue](#despliegue)
-18. [Decisiones de Diseno](#decisiones-de-diseno)
-19. [Licencia](#licencia)
-20. [Autor](#autor)
+1. [Descripción General](#descripcion-general)
+2. [Nuevos Módulos del Sistema](#nuevos-modulos-del-sistema)
+3. [Capturas de Pantalla](#capturas-de-pantalla)
+4. [Decisión Técnica: TMDB vs OMDb](#decision-tecnica-tmdb-vs-omdb)
+5. [Características Principales](#caracteristicas-principales)
+6. [Stack Tecnológico](#stack-tecnologico)
+7. [Arquitectura del Proyecto](#arquitectura-del-proyecto)
+8. [Instalación y Configuración](#instalacion-y-configuracion)
+9. [Variables de Entorno](#variables-de-entorno)
+10. [Scripts Disponibles](#scripts-disponibles)
+11. [Estructura de Directorios](#estructura-de-directorios)
+12. [Componentes Principales](#componentes-principales)
+13. [Custom Hooks](#custom-hooks)
+14. [Servicios](#servicios)
+15. [Optimizaciones de Rendimiento](#optimizaciones-de-rendimiento)
+16. [Accesibilidad](#accesibilidad)
+17. [Responsividad](#responsividad)
+18. [Despliegue](#despliegue)
+19. [Decisiones de Diseño](#decisiones-de-diseno)
+20. [Licencia](#licencia)
+21. [Autor](#autor)
 
 ---
 
-## Descripcion General
+## Descripción General
 
-**TMDB Terminal** es una aplicacion web moderna para la exploracion, busqueda y gestion de peliculas y series de television. Desarrollada como parte del **IEEE ESTl Frontend Hackathon 2025**, esta aplicacion implementa una arquitectura modular basada en componentes con React 19, gestion de estado mediante Context API, y una estetica visual inspirada en terminales retro con un toque cinematografico contemporaneo.
+**TMDB Terminal** es una aplicación web moderna para la exploración, búsqueda y gestión de películas y series de televisión. Desarrollada como parte del **IEEE ESTl Frontend Hackathon 2025**, esta aplicación implementa una arquitectura modular basada en componentes con React 19, gestión de estado mediante Context API, y una estética visual inspirada en terminales retro con un toque cinematográfico contemporáneo.
 
-La aplicacion permite a los usuarios:
+La aplicación permite a los usuarios:
 
 - Explorar contenido en tendencia actualizado semanalmente
-- Buscar peliculas y series con filtros avanzados
-- Visualizar informacion detallada incluyendo trailers, reparto y titulos similares
+- Buscar películas y series con filtros avanzados
+- Visualizar información detallada incluyendo tráilers, reparto y títulos similares
 - Gestionar una lista de favoritos persistente
 - Alternar entre modo claro y oscuro
 
-**URL de Produccion:** [movie-finder-tau-eight.vercel.app
-](https://movie-finder-tau-eight.vercel.app/)
+**URL de Producción:** [movie-finder-tau-eight.vercel.app](https://movie-finder-tau-eight.vercel.app/)
 
 **Repositorio:** [https://github.com/Juliocpo946/movie-finder](https://github.com/Juliocpo946/movie-finder)
 
 ---
 
+## Nuevos Módulos del Sistema (Actualización v2.0)
+
+Se han integrado nuevas secciones de inteligencia visual para mejorar la experiencia de descubrimiento:
+
+### 📡 Incoming Signals (Próximos Estrenos)
+Un carrusel de scroll horizontal libre que muestra las películas próximas a estrenarse.
+- **Efecto Visual:** Las tarjetas emergen desde las profundidades ("Deep Rise Animation") con un efecto de desenfoque (blur) que se limpia al entrar en el viewport.
+- **Interacción:** Scroll fluido sin atascos ("snap-free").
+
+### HEX Active Operatives (Actores Populares)
+Base de datos visual de las personalidades más populares del momento.
+- **Diseño:** Grid hexagonal/geométrico con máscaras de recorte (`clip-path`).
+- **Animación:** Efecto cascada (stagger) al cargar los perfiles y transformación a color al pasar el cursor (hover).
+
+### 📟 System Ticker (Barra de Estado)
+Barra de noticias en movimiento continuo estilo teletipo.
+- **Función:** Muestra el estado del sistema y mensajes decorativos ("SYSTEM STATUS: ONLINE", "DECRYPTING FILES") para inmersión total.
+- **Ubicación:** Anclada bajo la barra de búsqueda para visibilidad constante.
+
+### 📂 System Directories (Accesos Rápidos)
+Botones de acceso directo a géneros cinematográficos simulando carpetas del sistema.
+- **Estilo:** Botones minimalistas con indicadores visuales y micro-interacciones.
+
+### 🔄 Multi-Tab Sync (Sincronización en Tiempo Real)
+Los favoritos ahora se sincronizan instantáneamente entre pestañas abiertas. Si agregas una película en una ventana, aparecerá automáticamente en las demás sin recargar la página.
+
+---
+
 ## Capturas de Pantalla
 
-### Pagina Principal (Home)
+### Página Principal (Home)
 
 ![Home Page](./images/home.png)
 
-*Vista principal con hero dinamico, barra de busqueda prominente y secciones de contenido trending y popular.*
+*Vista principal con hero dinámico, ticker de estado y secciones modulares de contenido trending y popular.*
 
 ---
 
-### Pagina de Busqueda
+### Página de Búsqueda
 
 ![Search Page](./images/search.png)
 
-*Resultados de busqueda con filtros avanzados por tipo, genero, anio y ordenamiento. Incluye toggle para vista grid/lista.*
+*Resultados de búsqueda con filtros avanzados por tipo, género, año y ordenamiento. Incluye toggle para vista grid/lista.*
 
 ---
 
-### Pagina de Detalle
+### Página de Detalle
 
 ![Detail Page](./images/detail.png)
 
-*Vista detallada con poster, informacion completa, trailer embebido de YouTube y seccion de titulos relacionados.*
+*Vista detallada con póster, información completa, tráiler embebido de YouTube y sección de títulos relacionados.*
 
 ---
 
-### Vista Movil
+### Vista Móvil
 
 ![Mobile View](./images/movil.png)
 
-*Diseno responsive adaptado para dispositivos moviles con navegacion hamburguesa y componentes optimizados.*
+*Diseño responsive adaptado para dispositivos móviles con navegación hamburguesa y componentes optimizados.*
 
 ---
 
-### Pagina 404
+### Página 404
 
 ![404 Page](./images/404.png)
 
-*Pagina de error personalizada con diseno consistente y navegacion de retorno.*
+*Página de error personalizada con diseño consistente y navegación de retorno.*
 
 ---
-## Decision Tecnica: TMDB vs OMDb
 
-Este proyecto implementa **TMDB (The Movie Database) API** como fuente principal de datos. Esta eleccion esta **explicitamente contemplada en las reglas del hackathon**, donde se menciona en la seccion de "APIs Adicionales (Opcionales)":
+## Decisión Técnica: TMDB vs OMDb
+
+Este proyecto implementa **TMDB (The Movie Database) API** como fuente principal de datos. Esta elección está **explícitamente contemplada en las reglas del hackathon**, donde se menciona en la sección de "APIs Adicionales (Opcionales)":
 
 > *"TMDB API: Como alternativa o complemento a OMDb"*
 
-La decision de utilizar TMDB como API principal (en lugar de complementaria) se fundamenta en las siguientes limitaciones tecnicas detectadas en OMDb durante la fase de analisis:
+La decisión de utilizar TMDB como API principal (en lugar de complementaria) se fundamenta en las siguientes limitaciones técnicas detectadas en OMDb durante la fase de análisis:
 
 ### Limitaciones de OMDb
 
 | Aspecto | OMDb | TMDB |
 |---------|------|------|
 | **Endpoints de Descubrimiento** | No disponible | `/trending`, `/discover`, `/similar` |
-| **Calidad de Imagenes** | Baja/variable | Multiples resoluciones optimizadas |
-| **Filtros Combinados** | Limitado | Soporte completo via `/discover` |
-| **Cuota de Peticiones** | 1,000/dia | 40 req/10s (mas flexible) |
-| **Datos de Videos** | No disponible | Trailers y clips de YouTube |
+| **Calidad de Imágenes** | Baja/variable | Múltiples resoluciones optimizadas |
+| **Filtros Combinados** | Limitado | Soporte completo vía `/discover` |
+| **Cuota de Peticiones** | 1,000/día | 40 req/10s (más flexible) |
+| **Datos de Videos** | No disponible | Tráilers y clips de YouTube |
 
-### Justificacion Detallada
+### Justificación Detallada
 
-Al estar TMDB listada como API permitida en las reglas oficiales del hackathon, se opto por utilizarla como fuente principal debido a:
+Al estar TMDB listada como API permitida en las reglas oficiales del hackathon, se optó por utilizarla como fuente principal debido a:
 
-1. **Endpoints de Descubrimiento:** OMDb carece de endpoints nativos para obtener "Trending" o "Titulos Similares". TMDB ofrece endpoints especificos que permiten una implementacion real sin datos estaticos.
+1. **Endpoints de Descubrimiento:** OMDb carece de endpoints nativos para obtener "Trending" o "Títulos Similares". TMDB ofrece endpoints específicos que permiten una implementación real sin datos estáticos.
 
-2. **Calidad de Recursos Graficos:** La interfaz requiere posters y backdrops de alta resolucion. TMDB proporciona multiples tamanios optimizados (`w300`, `w500`, `original`).
+2. **Calidad de Recursos Gráficos:** La interfaz requiere pósters y backdrops de alta resolución. TMDB proporciona múltiples tamaños optimizados (`w300`, `w500`, `original`).
 
-3. **Capacidades de Filtrado:** El endpoint `/discover` de TMDB permite combinar multiples parametros (genero, anio, tipo, ordenamiento) en una sola consulta.
+3. **Capacidades de Filtrado:** El endpoint `/discover` de TMDB permite combinar múltiples parámetros (género, año, tipo, ordenamiento) en una sola consulta.
 
-4. **Integracion de Trailers:** TMDB incluye datos de videos de YouTube directamente en sus respuestas, permitiendo embeber trailers oficiales sin necesidad de una segunda API.
+4. **Integración de Tráilers:** TMDB incluye datos de videos de YouTube directamente en sus respuestas, permitiendo embeber tráilers oficiales sin necesidad de una segunda API.
 
-Esta decision permite cumplir de manera mas robusta con los requerimientos de la rubrica, especialmente en los criterios de "Funcionalidades", "Creatividad" y "Experiencia de Usuario".
+Esta decisión permite cumplir de manera más robusta con los requerimientos de la rúbrica, especialmente en los criterios de "Funcionalidades", "Creatividad" y "Experiencia de Usuario".
 
 ---
 
-## Caracteristicas Principales
+## Características Principales
 
-### Busqueda y Filtrado
+### Búsqueda y Filtrado
 
-- **Busqueda en Tiempo Real:** Custom hook con debouncing de 500ms para minimizar llamadas a la API
-- **Filtros Avanzados:** 
-  - Tipo de contenido (Pelicula/Serie)
-  - Genero (18 categorias disponibles)
-  - Anio de lanzamiento
-  - Ordenamiento (Popularidad, Valoracion, Fecha)
-- **Vistas Dinamicas:** Alternancia entre grid y lista con persistencia de preferencia
-- **Paginacion Infinita:** Carga progresiva de resultados sin recarga de pagina
+- **Búsqueda en Tiempo Real:** Custom hook con debouncing de 500ms para minimizar llamadas a la API
+- **Filtros Avanzados:**
+  - Tipo de contenido (Película/Serie)
+  - Género (18 categorías disponibles)
+  - Año de lanzamiento
+  - Ordenamiento (Popularidad, Valoración, Fecha)
+- **Vistas Dinámicas:** Alternancia entre grid y lista con persistencia de preferencia
+- **Paginación Infinita:** Carga progresiva de resultados sin recarga de página
 
 ### Experiencia de Usuario
 
-- **Diseno Responsive:** Mobile-first con breakpoints optimizados
+- **Diseño Responsive:** Mobile-first con breakpoints optimizados
 - **Animaciones Fluidas:** Transiciones entre rutas y micro-interacciones con Framer Motion
 - **Feedback Visual:** Skeletons de carga, indicadores de estado y mensajes de error claros
-- **Tema Oscuro/Claro:** Deteccion automatica de preferencia del sistema con toggle manual
+- **Tema Oscuro/Claro:** Detección automática de preferencia del sistema con toggle manual
 
-### Gestion de Contenido
+### Gestión de Contenido
 
-- **Vista Detallada:** Sinopsis, reparto, director, metadatos tecnicos y trailer embebido
-- **Sistema de Favoritos:** Persistencia en LocalStorage con conteo por tipo
-- **Titulos Similares:** Recomendaciones basadas en el contenido actual
+- **Vista Detallada:** Sinopsis, reparto, director, metadatos técnicos y tráiler embebido
+- **Sistema de Favoritos:** Persistencia en LocalStorage con conteo por tipo y sincronización multi-pestaña.
+- **Títulos Similares:** Recomendaciones basadas en el contenido actual
 - **Compartir:** Funcionalidad nativa de Web Share API con fallback a clipboard
 
 ### Optimizaciones
 
-- **Sistema de Cache:** Cache en memoria con TTL de 5 minutos para reducir peticiones
-- **Cancelacion de Peticiones:** AbortController para evitar race conditions
-- **Lazy Loading:** Carga diferida de imagenes con fallback a placeholder
-- **Normalizacion de Datos:** Capa de abstraccion para estandarizar respuestas de API
+- **Sistema de Caché:** Caché en memoria con TTL de 5 minutos para reducir peticiones
+- **Cancelación de Peticiones:** AbortController para evitar race conditions
+- **Lazy Loading:** Carga diferida de imágenes con fallback a placeholder
+- **Normalización de Datos:** Capa de abstracción para estandarizar respuestas de API
 
 ---
 
-## Stack Tecnologico
+## Stack Tecnológico
 
 ### Core
 
-| Tecnologia | Version | Proposito |
+| Tecnología | Versión | Propósito |
 |------------|---------|-----------|
 | React | 19.2.0 | Biblioteca UI con hooks y componentes funcionales |
-| Vite | 7.2.4 | Build tool con HMR ultrarapido |
+| Vite | 7.2.4 | Build tool con HMR ultrarrápido |
 | React Router DOM | 7.9.6 | Enrutamiento declarativo con layouts anidados |
 
 ### Estilos y UI
 
-| Tecnologia | Version | Proposito |
+| Tecnología | Versión | Propósito |
 |------------|---------|-----------|
 | Tailwind CSS | 4.1.17 | Framework CSS utility-first |
 | Framer Motion | 12.23.24 | Animaciones declarativas y transiciones |
@@ -185,15 +215,15 @@ Esta decision permite cumplir de manera mas robusta con los requerimientos de la
 
 ### Herramientas de Desarrollo
 
-| Tecnologia | Version | Proposito |
+| Tecnología | Versión | Propósito |
 |------------|---------|-----------|
-| ESLint | 9.39.1 | Linting y estandarizacion de codigo |
+| ESLint | 9.39.1 | Linting y estandarización de código |
 | PostCSS | 8.5.6 | Procesamiento de CSS |
 | Autoprefixer | 10.4.22 | Compatibilidad cross-browser |
 
-### Tipografias
+### Tipografías
 
-- **Oswald:** Titulos y headers (peso 500, 700)
+- **Oswald:** Títulos y headers (peso 500, 700)
 - **Space Mono:** Cuerpo de texto y elementos UI (peso 400, 700)
 
 ---
@@ -201,40 +231,42 @@ Esta decision permite cumplir de manera mas robusta con los requerimientos de la
 ## Arquitectura del Proyecto
 
 ```
-Arquitectura basada en capas con separacion de responsabilidades:
 
-+------------------+     +------------------+     +------------------+
+Arquitectura basada en capas con separación de responsabilidades:
+
+\+------------------+     +------------------+     +------------------+
 |     PAGES        |     |   COMPONENTS     |     |     CONTEXT      |
-|  (Vistas/Rutas)  |<--->|   (UI Atomica)   |<--->|  (Estado Global) |
-+------------------+     +------------------+     +------------------+
-         |                       |                       |
-         v                       v                       v
-+------------------+     +------------------+     +------------------+
+|  (Vistas/Rutas)  |\<---\>|   (UI Atómica)   |\<---\>|  (Estado Global) |
+\+------------------+     +------------------+     +------------------+
+|                       |                       |
+v                       v                       v
+\+------------------+     +------------------+     +------------------+
 |     HOOKS        |     |    SERVICES      |     |     UTILS        |
-| (Logica Negocio) |<--->| (Cache/Storage)  |<--->| (Helpers/Const)  |
-+------------------+     +------------------+     +------------------+
-         |
-         v
-+------------------+
+| (Lógica Negocio) |\<---\>| (Cache/Storage)  |\<---\>| (Helpers/Const)  |
+\+------------------+     +------------------+     +------------------+
+|
+v
+\+------------------+
 |       API        |
 |  (TMDB Client)   |
-+------------------+
-```
+\+------------------+
+
+````
 
 ### Flujo de Datos
 
-1. **Usuario interactua** con un componente de UI
+1. **Usuario interactúa** con un componente de UI
 2. **Componente dispara** un custom hook
-3. **Hook gestiona** la logica de negocio y llama al servicio de API
-4. **Servicio de cache** verifica si existe data valida
-5. **API Client** realiza la peticion si es necesario
+3. **Hook gestiona** la lógica de negocio y llama al servicio de API
+4. **Servicio de caché** verifica si existe data válida
+5. **API Client** realiza la petición si es necesario
 6. **Respuesta normalizada** se propaga hacia arriba
 7. **Context actualiza** estado global si aplica
 8. **UI re-renderiza** con los nuevos datos
 
 ---
 
-## Instalacion y Configuracion
+## Instalación y Configuración
 
 ### Prerrequisitos
 
@@ -242,11 +274,11 @@ Arquitectura basada en capas con separacion de responsabilidades:
 - pnpm >= 8.0.0 (recomendado) o npm >= 10.0.0
 - Cuenta en TMDB para obtener API Key
 
-### Pasos de Instalacion
+### Pasos de Instalación
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/Juliocpo946/movie-finder.git
+git clone [https://github.com/Juliocpo946/movie-finder.git](https://github.com/Juliocpo946/movie-finder.git)
 cd movie-finder
 
 # 2. Instalar dependencias con pnpm (recomendado)
@@ -255,44 +287,44 @@ pnpm install
 # 3. Copiar archivo de variables de entorno
 cp .env.example .env
 
-# 4. Configurar variables de entorno (ver seccion siguiente)
+# 4. Configurar variables de entorno (ver sección siguiente)
 
 # 5. Iniciar servidor de desarrollo
 pnpm dev
-```
+````
 
-La aplicacion estara disponible en `http://localhost:5173`
+La aplicación estará disponible en `http://localhost:5173`
 
----
+-----
 
 ## Variables de Entorno
 
-Crear un archivo `.env` en la raiz del proyecto con las siguientes variables:
+Crear un archivo `.env` en la raíz del proyecto con las siguientes variables:
 
 ```env
-# API Key de TMDB (obtenida en https://www.themoviedb.org/settings/api)
+# API Key de TMDB (obtenida en [https://www.themoviedb.org/settings/api](https://www.themoviedb.org/settings/api))
 VITE_TMDB_API_KEY=tu_api_key_aqui
 
-# Access Token de TMDB (Bearer Token para autenticacion)
+# Access Token de TMDB (Bearer Token para autenticación)
 VITE_TMDB_ACCESS_TOKEN=tu_access_token_aqui
 
 # URL base de la API de TMDB
-VITE_TMDB_BASE_URL=https://api.themoviedb.org/3
+VITE_TMDB_BASE_URL=[https://api.themoviedb.org/3](https://api.themoviedb.org/3)
 
-# URL base para imagenes de TMDB
-VITE_TMDB_IMAGE_URL=https://image.tmdb.org/t/p/original
+# URL base para imágenes de TMDB
+VITE_TMDB_IMAGE_URL=[https://image.tmdb.org/t/p/original](https://image.tmdb.org/t/p/original)
 ```
 
-### Obtencion de Credenciales TMDB
+### Obtención de Credenciales TMDB
 
-1. Crear cuenta en [TMDB](https://www.themoviedb.org/signup)
-2. Ir a Settings > API
-3. Solicitar una API Key (tipo: Developer)
-4. Copiar tanto la API Key como el Access Token (Bearer)
+1.  Crear cuenta en [TMDB](https://www.themoviedb.org/signup)
+2.  Ir a Settings \> API
+3.  Solicitar una API Key (tipo: Developer)
+4.  Copiar tanto la API Key como el Access Token (Bearer)
 
-**Importante:** Nunca subir el archivo `.env` al repositorio. Esta incluido en `.gitignore`.
+**Importante:** Nunca subir el archivo `.env` al repositorio. Está incluido en `.gitignore`.
 
----
+-----
 
 ## Scripts Disponibles
 
@@ -300,80 +332,85 @@ VITE_TMDB_IMAGE_URL=https://image.tmdb.org/t/p/original
 # Desarrollo
 pnpm dev          # Inicia servidor de desarrollo con HMR
 
-# Construccion
-pnpm build        # Genera build de produccion en /dist
+# Construcción
+pnpm build        # Genera build de producción en /dist
 
 # Preview
-pnpm preview      # Sirve el build de produccion localmente
+pnpm preview      # Sirve el build de producción localmente
 
 # Linting
 pnpm lint         # Ejecuta ESLint en todo el proyecto
 ```
 
----
+-----
 
 ## Estructura de Directorios
 
 ```
 tmdb-terminal/
 |
-|-- public/                    # Assets estaticos
+|-- public/                    # Assets estáticos
 |   |-- vite.svg              # Favicon
 |
 |-- src/
-|   |-- api/                  # Capa de comunicacion con APIs externas
-|   |   |-- endpoints.js      # Definicion de constantes de endpoints
+|   |-- api/                  # Capa de comunicación con APIs externas
+|   |   |-- endpoints.js      # Definición de constantes de endpoints
 |   |   |-- index.js          # Barrel export
 |   |   |-- tmdb.js           # Cliente HTTP para TMDB API
 |   |
 |   |-- components/           # Componentes React reutilizables
-|   |   |-- Button.jsx        # Boton con variantes y animaciones
-|   |   |-- Card.jsx          # Tarjeta de pelicula/serie
-|   |   |-- Hero.jsx          # Seccion hero de pagina principal
+|   |   |-- ActiveOperatives.jsx #  Grid de actores
+|   |   |-- Button.jsx        # Botón con variantes y animaciones
+|   |   |-- Card.jsx          # Tarjeta de película/serie
+|   |   |-- Directories.jsx   #  Accesos rápidos a géneros
+|   |   |-- Hero.jsx          # Sección hero de página principal
+|   |   |-- IncomingSignals.jsx #  Carrusel de estrenos
 |   |   |-- Input.jsx         # Input estilizado con indicador
 |   |   |-- Layout.jsx        # Layout principal con Outlet
 |   |   |-- Loader.jsx        # Indicador de carga animado
-|   |   |-- Navbar.jsx        # Barra de navegacion responsive
+|   |   |-- Navbar.jsx        # Barra de navegación responsive
+|   |   |-- PopularSection.jsx # Sección reutilizable de contenido popular
+|   |   |-- Ticker.jsx        #  Barra de estado animada
 |   |
 |   |-- context/              # Proveedores de estado global
-|   |   |-- FavoritesContext.jsx  # Gestion de lista de favoritos
-|   |   |-- ThemeContext.jsx      # Gestion de tema claro/oscuro
+|   |   |-- FavoritesContext.jsx  # Gestión de lista de favoritos
+|   |   |-- ThemeContext.jsx      # Gestión de tema claro/oscuro
 |   |   |-- index.js              # Barrel export
 |   |
-|   |-- hooks/                # Custom hooks para logica de negocio
+|   |-- hooks/                # Custom hooks para lógica de negocio
 |   |   |-- index.js              # Barrel export
 |   |   |-- useClickOutside.js    # Detecta clicks fuera de un elemento
 |   |   |-- useDebounce.js        # Debouncing de valores
-|   |   |-- useFetch.js           # Wrapper generico para peticiones
+|   |   |-- useFetch.js           # Wrapper genérico para peticiones
 |   |   |-- useLocalStorage.js    # Persistencia en localStorage
-|   |   |-- useMediaDetails.js    # Obtiene detalles de pelicula/serie
-|   |   |-- useSearch.js          # Logica de busqueda con paginacion
+|   |   |-- useMediaDetails.js    # Obtiene detalles de película/serie
+|   |   |-- useSearch.js          # Lógica de búsqueda con paginación
 |   |   |-- useTrending.js        # Obtiene contenido en tendencia
 |   |   |-- useWindowSize.js      # Dimensiones de viewport reactivas
 |   |
-|   |-- pages/                # Componentes de pagina (rutas)
+|   |-- pages/                # Componentes de página (rutas)
 |   |   |-- DetailPage.jsx    # Vista de detalle de contenido
 |   |   |-- FavoritesPage.jsx # Lista de favoritos del usuario
-|   |   |-- HomePage.jsx      # Pagina principal con trending
-|   |   |-- NotFoundPage.jsx  # Pagina 404 personalizada
-|   |   |-- SearchPage.jsx    # Busqueda con filtros avanzados
+|   |   |-- HomePage.jsx      # Página principal con trending
+|   |   |-- NotFoundPage.jsx  # Página 404 personalizada
+|   |   |-- SearchPage.jsx    # Búsqueda con filtros avanzados
 |   |
 |   |-- services/             # Servicios de infraestructura
-|   |   |-- cache.js          # Sistema de cache en memoria
+|   |   |-- cache.js          # Sistema de caché en memoria
 |   |   |-- index.js          # Barrel export
 |   |   |-- storage.js        # Wrapper de localStorage
 |   |
 |   |-- utils/                # Utilidades y constantes
-|   |   |-- constants.js      # Constantes de la aplicacion
+|   |   |-- constants.js      # Constantes de la aplicación
 |   |   |-- helpers.js        # Funciones de utilidad
 |   |   |-- index.js          # Barrel export
 |   |
-|   |-- App.jsx               # Componente raiz con providers
-|   |-- index.css             # Estilos globales y configuracion Tailwind
+|   |-- App.jsx               # Componente raíz con providers
+|   |-- index.css             # Estilos globales y configuración Tailwind
 |   |-- main.jsx              # Punto de entrada de React
-|   |-- routes.jsx            # Configuracion de React Router
+|   |-- routes.jsx            # Configuración de React Router
 |
-|-- images/                   # Capturas de pantalla para documentacion
+|-- images/                   # Capturas de pantalla para documentación
 |   |-- 404.png
 |   |-- detail.png
 |   |-- home.png
@@ -382,24 +419,28 @@ tmdb-terminal/
 |
 |-- .env.example              # Plantilla de variables de entorno
 |-- .gitignore                # Archivos ignorados por Git
-|-- eslint.config.js          # Configuracion de ESLint
+|-- eslint.config.js          # Configuración de ESLint
 |-- index.html                # HTML template
 |-- LICENSE                   # Licencia MIT
 |-- package.json              # Dependencias y scripts
 |-- pnpm-lock.yaml            # Lockfile de pnpm
-|-- postcss.config.js         # Configuracion de PostCSS
+|-- postcss.config.js         # Configuración de PostCSS
 |-- README.md                 # Este archivo
-|-- tailwind.config.js        # Configuracion de Tailwind CSS
-|-- vite.config.js            # Configuracion de Vite
+|-- tailwind.config.js        # Configuración de Tailwind CSS
+|-- vite.config.js            # Configuración de Vite
 ```
 
----
+-----
 
 ## Componentes Principales
 
+### ActiveOperatives 
+
+Grid visual que muestra actores y personalidades populares usando formas hexagonales generadas mediante `clip-path` CSS. Incluye animaciones de entrada en cascada y efectos hover de color.
+
 ### Button
 
-Boton reutilizable con tres variantes (`primary`, `secondary`, `danger`) y animaciones de hover/tap via Framer Motion.
+Botón reutilizable con tres variantes (`primary`, `secondary`, `danger`) y animaciones de hover/tap vía Framer Motion.
 
 ```jsx
 <Button variant="primary" onClick={handleClick}>
@@ -409,7 +450,7 @@ Boton reutilizable con tres variantes (`primary`, `secondary`, `danger`) y anima
 
 ### Card
 
-Tarjeta de contenido con soporte para vista grid y lista. Incluye animaciones de entrada, lazy loading de imagenes y transiciones de layout compartidas.
+Tarjeta de contenido polimórfica con soporte para vista grid y lista. Incluye animaciones de entrada con efecto de desenfoque (`blur`), lazy loading de imágenes y transiciones de layout compartidas para evitar saltos visuales.
 
 ```jsx
 <Card 
@@ -421,7 +462,11 @@ Tarjeta de contenido con soporte para vista grid y lista. Incluye animaciones de
 
 ### Hero
 
-Seccion hero dinamica con imagen de fondo, informacion del contenido destacado y acciones rapidas (ver detalles, agregar a watchlist).
+Sección hero dinámica con imagen de fondo, información del contenido destacado y acciones rápidas (ver detalles, agregar a watchlist).
+
+### IncomingSignals 
+
+Módulo de scroll horizontal fluido ("snap-free") que consume el endpoint `/movie/upcoming` para mostrar próximos estrenos. Utiliza variantes de animación para crear una sensación de profundidad al hacer scroll.
 
 ### Input
 
@@ -433,19 +478,24 @@ Indicador de carga con barra de progreso animada y texto parpadeante.
 
 ### Navbar
 
-Barra de navegacion fija con:
-- Logo con indicador animado
-- Links de navegacion con underline animado
-- Menu hamburguesa para moviles
-- Contador de favoritos en tiempo real
+Barra de navegación fija con:
 
----
+  - Logo con indicador animado
+  - Links de navegación con underline animado
+  - Menú hamburguesa para móviles
+  - Contador de favoritos en tiempo real
+
+### Ticker
+
+Barra de estado estilo teletipo que muestra mensajes del sistema en un loop infinito, aumentando la inmersión de la interfaz.
+
+-----
 
 ## Custom Hooks
 
 ### useDebounce
 
-Retrasa la actualizacion de un valor para evitar llamadas excesivas.
+Retrasa la actualización de un valor para evitar llamadas excesivas.
 
 ```javascript
 const debouncedQuery = useDebounce(query, 500);
@@ -453,11 +503,14 @@ const debouncedQuery = useDebounce(query, 500);
 
 ### useSearch
 
-Gestiona la logica de busqueda incluyendo:
-- Seleccion de estrategia (search vs discover)
-- Cancelacion de peticiones previas con AbortController
-- Paginacion con prevencion de duplicados
-- Estados de carga y error
+Gestiona la lógica de búsqueda incluyendo:
+
+  - Selección de estrategia (search vs discover)
+  - Cancelación de peticiones previas con AbortController
+  - Paginación con prevención de duplicados
+  - Estados de carga y error
+
+<!-- end list -->
 
 ```javascript
 const { results, status, search, loadMore } = useSearch();
@@ -465,7 +518,7 @@ const { results, status, search, loadMore } = useSearch();
 
 ### useMediaDetails
 
-Obtiene detalles completos de una pelicula o serie, intentando primero como movie y luego como TV si falla.
+Obtiene detalles completos de una película o serie, intentando primero como movie y luego como TV si falla.
 
 ```javascript
 const { details, status, fetchById } = useMediaDetails();
@@ -481,7 +534,7 @@ const { trending, featuredMovie, isLoading } = useTrending();
 
 ### useFetch
 
-Hook generico para peticiones HTTP con soporte de cache, estados de carga y manejo de errores.
+Hook genérico para peticiones HTTP con soporte de caché, estados de carga y manejo de errores.
 
 ### useClickOutside
 
@@ -491,20 +544,20 @@ Detecta clicks fuera de un elemento referenciado.
 
 Proporciona dimensiones del viewport y flags de breakpoints (`isMobile`, `isTablet`, `isDesktop`).
 
----
+-----
 
 ## Servicios
 
 ### Cache Service
 
-Sistema de cache en memoria con TTL configurable (5 minutos por defecto).
+Sistema de caché en memoria con TTL configurable (5 minutos por defecto).
 
 ```javascript
-// Caracteristicas:
+// Características:
 // - Almacenamiento en Map para acceso O(1)
-// - Validacion de expiracion automatica
-// - Generacion de claves unicas por endpoint+params
-// - Metodo de limpieza proactiva
+// - Validación de expiración automática
+// - Generación de claves únicas por endpoint+params
+// - Método de limpieza proactiva
 
 cacheService.get(key);
 cacheService.set(key, data);
@@ -515,10 +568,13 @@ cacheService.cleanup();
 ### Storage Service
 
 Wrapper de localStorage con:
-- Validacion de disponibilidad
-- Serializacion/deserializacion JSON automatica
-- Manejo de errores de cuota excedida
-- Valores por defecto
+
+  - Validación de disponibilidad
+  - Serialización/deserialización JSON automática
+  - Manejo de errores de cuota excedida
+  - Valores por defecto
+
+<!-- end list -->
 
 ```javascript
 storageService.set('key', { data: 'value' });
@@ -526,64 +582,70 @@ storageService.get('key', defaultValue);
 storageService.remove('key');
 ```
 
----
+-----
 
 ## Optimizaciones de Rendimiento
 
 ### Implementadas
 
-1. **Sistema de Cache en Memoria**
-   - Evita peticiones redundantes a la API
-   - TTL de 5 minutos configurable
-   - Limpieza automatica de entradas expiradas
+1.  **Sistema de Caché en Memoria**
 
-2. **Debouncing de Busqueda**
-   - Delay de 500ms antes de ejecutar busqueda
-   - Reduce llamadas a API mientras el usuario escribe
+      - Evita peticiones redundantes a la API
+      - TTL de 5 minutos configurable
+      - Limpieza automática de entradas expiradas
 
-3. **Cancelacion de Peticiones**
-   - AbortController para cancelar peticiones obsoletas
-   - Previene race conditions en busquedas rapidas
+2.  **Debouncing de Búsqueda**
 
-4. **Lazy Loading de Imagenes**
-   - Atributo `loading="lazy"` en imagenes no criticas
-   - `fetchPriority="high"` para imagenes del hero (LCP)
-   - Placeholders mientras cargan las imagenes
+      - Delay de 500ms antes de ejecutar búsqueda
+      - Reduce llamadas a API mientras el usuario escribe
 
-5. **Optimizacion de Renders**
-   - useCallback para funciones de context
-   - Lazy initialization en useState
-   - Keys unicas con prefijos para evitar conflictos de animacion
+3.  **Cancelación de Peticiones**
 
-6. **Code Splitting Implicito**
-   - Vite divide automaticamente el bundle por rutas
-   - Chunks separados para dependencias grandes
+      - AbortController para cancelar peticiones obsoletas
+      - Previene race conditions en búsquedas rápidas
 
-### Metricas Objetivo
+4.  **Lazy Loading de Imágenes**
 
-| Metrica | Objetivo | Herramienta |
+      - Atributo `loading="lazy"` en imágenes no críticas
+      - `fetchPriority="high"` para imágenes del hero (LCP)
+      - Placeholders mientras cargan las imágenes
+
+5.  **Optimización de Renders**
+
+      - useCallback para funciones de context
+      - Lazy initialization en useState
+      - Keys únicas con prefijos para evitar conflictos de animación
+
+6.  **Code Splitting Implícito**
+
+      - Vite divide automáticamente el bundle por rutas
+      - Chunks separados para dependencias grandes
+
+### Métricas Objetivo
+
+| Métrica | Objetivo | Herramienta |
 |---------|----------|-------------|
-| LCP | < 2.5s | Lighthouse |
-| FID | < 100ms | Lighthouse |
-| CLS | < 0.1 | Lighthouse |
-| Bundle Size | < 200KB gzipped | Vite |
-| TTI | < 3s | Lighthouse |
+| LCP | \< 2.5s | Lighthouse |
+| FID | \< 100ms | Lighthouse |
+| CLS | \< 0.1 | Lighthouse |
+| Bundle Size | \< 200KB gzipped | Vite |
+| TTI | \< 3s | Lighthouse |
 
----
+-----
 
 ## Accesibilidad
 
 ### Implementaciones
 
-- **ARIA Labels:** Todos los controles interactivos tienen labels descriptivos
-- **Roles Semanticos:** Uso de `role="group"` para conjuntos de filtros
-- **Estados ARIA:** `aria-pressed` en toggles de vista
-- **Contraste:** Colores verificados para ratio WCAG AA
-- **Focus Visible:** Indicadores claros de foco en elementos interactivos
-- **Navegacion por Teclado:** Soporte completo de Tab y Enter
-- **Alt Text:** Todas las imagenes tienen texto alternativo
+  - **ARIA Labels:** Todos los controles interactivos tienen labels descriptivos
+  - **Roles Semánticos:** Uso de `role="group"` para conjuntos de filtros
+  - **Estados ARIA:** `aria-pressed` en toggles de vista
+  - **Contraste:** Colores verificados para ratio WCAG AA
+  - **Focus Visible:** Indicadores claros de foco en elementos interactivos
+  - **Navegación por Teclado:** Soporte completo de Tab y Enter
+  - **Alt Text:** Todas las imágenes tienen texto alternativo
 
-### Ejemplo de Implementacion
+### Ejemplo de Implementación
 
 ```jsx
 <button
@@ -595,7 +657,7 @@ storageService.remove('key');
 </button>
 ```
 
----
+-----
 
 ## Responsividad
 
@@ -603,7 +665,7 @@ storageService.remove('key');
 
 | Breakpoint | Ancho | Dispositivos |
 |------------|-------|--------------|
-| sm | 640px | Moviles grandes |
+| sm | 640px | Móviles grandes |
 | md | 768px | Tablets |
 | lg | 1024px | Laptops |
 | xl | 1280px | Desktops |
@@ -623,24 +685,27 @@ lg:grid-cols-4
 
 ### Adaptaciones por Dispositivo
 
-**Movil:**
-- Menu hamburguesa colapsable
-- Cards de ancho completo
-- Busqueda simplificada
-- Touch targets de 44px minimo
+**Móvil:**
+
+  - Menú hamburguesa colapsable
+  - Cards de ancho completo
+  - Búsqueda simplificada
+  - Touch targets de 44px mínimo
 
 **Tablet:**
-- Grid de 2 columnas
-- Filtros en fila
-- Navegacion hibrida
+
+  - Grid de 2 columnas
+  - Filtros en fila
+  - Navegación híbrida
 
 **Desktop:**
-- Grid de 4+ columnas
-- Filtros expandidos
-- Animaciones completas
-- Hover states
 
----
+  - Grid de 4+ columnas
+  - Filtros expandidos
+  - Animaciones completas
+  - Hover states
+
+-----
 
 ## Despliegue
 
@@ -666,66 +731,66 @@ pnpm build
 netlify deploy --prod --dir=dist
 ```
 
-### Variables de Entorno en Produccion
+### Variables de Entorno en Producción
 
 Configurar en el dashboard del proveedor:
 
 ```
 VITE_TMDB_API_KEY=xxx
 VITE_TMDB_ACCESS_TOKEN=xxx
-VITE_TMDB_BASE_URL=https://api.themoviedb.org/3
-VITE_TMDB_IMAGE_URL=https://image.tmdb.org/t/p/original
+VITE_TMDB_BASE_URL=[https://api.themoviedb.org/3](https://api.themoviedb.org/3)
+VITE_TMDB_IMAGE_URL=[https://image.tmdb.org/t/p/original](https://image.tmdb.org/t/p/original)
 ```
 
----
+-----
 
-## Decisiones de Diseno
+## Decisiones de Diseño
 
-### Estetica Visual
+### Estética Visual
 
-- **Inspiracion Terminal:** Tipografia monoespaciada, cursores animados, estetica hacker
-- **Paleta de Colores:** 
-  - Fondo: `#0a0a0a` (oscuro) / `#f3f4f6` (claro)
-  - Acento: `#ff2e00` (rojo terminal)
-  - Texto: `#ededed` (oscuro) / `#0a0a0a` (claro)
-- **Tipografia:** Oswald para impacto, Space Mono para legibilidad
+  - **Inspiración Terminal:** Tipografía monoespaciada, cursores animados, estética hacker
+  - **Paleta de Colores:** - Fondo: `#0a0a0a` (oscuro) / `#f3f4f6` (claro)
+      - Acento: `#ff2e00` (rojo terminal)
+      - Texto: `#ededed` (oscuro) / `#0a0a0a` (claro)
+  - **Tipografía:** Oswald para impacto, Space Mono para legibilidad
 
 ### Patrones de UX
 
-- **Progressive Disclosure:** Informacion detallada solo en pagina de detalle
-- **Feedback Inmediato:** Estados de carga y confirmaciones visuales
-- **Consistencia:** Mismo lenguaje visual en toda la aplicacion
-- **Recuperacion de Errores:** Mensajes claros y acciones sugeridas
+  - **Progressive Disclosure:** Información detallada solo en página de detalle
+  - **Feedback Inmediato:** Estados de carga y confirmaciones visuales
+  - **Consistencia:** Mismo lenguaje visual en toda la aplicación
+  - **Recuperación de Errores:** Mensajes claros y acciones sugeridas
 
 ### Arquitectura de Componentes
 
-- **Atomic Design:** Componentes pequenios y reutilizables
-- **Composition over Inheritance:** Props para variaciones
-- **Single Responsibility:** Cada componente hace una cosa bien
-- **Colocation:** Logica relacionada cerca del componente
+  - **Atomic Design:** Componentes pequeños y reutilizables
+  - **Composition over Inheritance:** Props para variaciones
+  - **Single Responsibility:** Cada componente hace una cosa bien
+  - **Colocation:** Lógica relacionada cerca del componente
 
----
+-----
 
 ## Licencia
 
-Este proyecto esta licenciado bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para mas detalles.
+Este proyecto está licenciado bajo la Licencia MIT. Ver el archivo [LICENSE](https://www.google.com/search?q=LICENSE) para más detalles.
 
----
+-----
 
 ## Autor
 
-**Julio Cesar Perez Ortiz**
+**Julio César Pérez Ortiz**
 
-- GitHub: [github.com/Juliocpo946](https://github.com/Juliocpo946)
+  - GitHub: [github.com/Juliocpo946](https://github.com/Juliocpo946)
 
----
+-----
 
 ## Agradecimientos
 
-- **IEEE ESTl** por organizar el hackathon
-- **TMDB** por proporcionar una API robusta y bien documentada
-- **Comunidad React** por las herramientas y librerias utilizadas
+  - **IEEE ESTl** por organizar el hackathon
+  - **TMDB** por proporcionar una API robusta y bien documentada
+  - **Comunidad React** por las herramientas y librerías utilizadas
 
----
+-----
 
-*Desarrollado con dedicacion para el IEEE ESTl Frontend Hackathon 2025*
+*Desarrollado con dedicación para el IEEE ESTl Frontend Hackathon 2025*
+

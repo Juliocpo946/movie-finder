@@ -30,6 +30,16 @@ export const normalizeTmdbMovie = (item, type = 'movie') => {
   };
 };
 
+export const normalizeTmdbPerson = (item) => {
+  if (!item) return null;
+  return {
+    id: item.id,
+    name: item.name,
+    profilePath: item.profile_path ? `${IMAGE_BASE_URL}${item.profile_path}` : PLACEHOLDER_IMAGE,
+    knownFor: item.known_for ? item.known_for.map(k => k.title || k.name).slice(0, 2).join(', ') : 'Unknown'
+  };
+};
+
 const resolveGenreIds = (ids) => {
   if (!ids) return '';
   return ids.map(id => TMDB_GENRES.find(g => g.id === id)?.name).filter(Boolean).join(', ');
