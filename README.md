@@ -59,7 +59,7 @@ La aplicación permite a los usuarios:
 
 Se han integrado nuevas secciones de inteligencia visual para mejorar la experiencia de descubrimiento:
 
-### 📡 Incoming Signals (Próximos Estrenos)
+### Incoming Signals (Próximos Estrenos)
 Un carrusel de scroll horizontal libre que muestra las películas próximas a estrenarse.
 - **Efecto Visual:** Las tarjetas emergen desde las profundidades ("Deep Rise Animation") con un efecto de desenfoque (blur) que se limpia al entrar en el viewport.
 - **Interacción:** Scroll fluido sin atascos ("snap-free").
@@ -69,16 +69,16 @@ Base de datos visual de las personalidades más populares del momento.
 - **Diseño:** Grid hexagonal/geométrico con máscaras de recorte (`clip-path`).
 - **Animación:** Efecto cascada (stagger) al cargar los perfiles y transformación a color al pasar el cursor (hover).
 
-### 📟 System Ticker (Barra de Estado)
+### System Ticker (Barra de Estado)
 Barra de noticias en movimiento continuo estilo teletipo.
 - **Función:** Muestra el estado del sistema y mensajes decorativos ("SYSTEM STATUS: ONLINE", "DECRYPTING FILES") para inmersión total.
 - **Ubicación:** Anclada bajo la barra de búsqueda para visibilidad constante.
 
-### 📂 System Directories (Accesos Rápidos)
+### System Directories (Accesos Rápidos)
 Botones de acceso directo a géneros cinematográficos simulando carpetas del sistema.
 - **Estilo:** Botones minimalistas con indicadores visuales y micro-interacciones.
 
-### 🔄 Multi-Tab Sync (Sincronización en Tiempo Real)
+### Multi-Tab Sync (Sincronización en Tiempo Real)
 Los favoritos ahora se sincronizan instantáneamente entre pestañas abiertas. Si agregas una película en una ventana, aparecerá automáticamente en las demás sin recargar la página.
 
 ---
